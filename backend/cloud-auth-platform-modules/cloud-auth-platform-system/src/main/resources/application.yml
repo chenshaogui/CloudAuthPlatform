@@ -1,0 +1,13 @@
+# Tomcat
+server:
+  port: 9211
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: system
+  profiles:
+    # 环境配置：默认激活的 profile
+    # 优先级低于环境变量/命令行，部署时 docker -e SPRING_PROFILES_ACTIVE=dev|pub 会覆盖此处
+    active: local

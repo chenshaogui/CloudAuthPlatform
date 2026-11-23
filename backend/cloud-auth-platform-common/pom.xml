@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>io.gitee.chenshaogui.cloudauth</groupId>
+        <artifactId>cloud-auth-platform</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <modules>
+        <module>cloud-auth-platform-common-bom</module>
+        <module>cloud-auth-platform-common-alibaba-bom</module>
+        <module>cloud-auth-platform-common-log</module>
+        <module>cloud-auth-platform-common-service-impl</module>
+        <module>cloud-auth-platform-common-excel</module>
+        <module>cloud-auth-platform-common-core</module>
+        <module>cloud-auth-platform-common-redis</module>
+        <module>cloud-auth-platform-common-doc</module>
+        <module>cloud-auth-platform-common-security</module>
+        <module>cloud-auth-platform-common-satoken</module>
+        <module>cloud-auth-platform-common-web</module>
+        <module>cloud-auth-platform-common-mybatis</module>
+        <module>cloud-auth-platform-common-job</module>
+        <module>cloud-auth-platform-common-dubbo</module>
+        <module>cloud-auth-platform-common-seata</module>
+        <module>cloud-auth-platform-common-loadbalancer</module>
+        <module>cloud-auth-platform-common-oss</module>
+        <module>cloud-auth-platform-common-ratelimiter</module>
+        <module>cloud-auth-platform-common-idempotent</module>
+        <module>cloud-auth-platform-common-mail</module>
+        <module>cloud-auth-platform-common-sms</module>
+        <module>cloud-auth-platform-common-logstash</module>
+        <module>cloud-auth-platform-common-elasticsearch</module>
+        <module>cloud-auth-platform-common-skylog</module>
+        <module>cloud-auth-platform-common-prometheus</module>
+        <module>cloud-auth-platform-common-translation</module>
+        <module>cloud-auth-platform-common-sensitive</module>
+        <module>cloud-auth-platform-common-json</module>
+        <module>cloud-auth-platform-common-encrypt</module>
+        <module>cloud-auth-platform-common-tenant</module>
+        <module>cloud-auth-platform-common-websocket</module>
+        <module>cloud-auth-platform-common-social</module>
+        <module>cloud-auth-platform-common-nacos</module>
+        <module>cloud-auth-platform-common-bus</module>
+        <module>cloud-auth-platform-common-sse</module>
+    </modules>
+
+    <artifactId>cloud-auth-platform-common</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+        ruoyi-common通用模块
+    </description>
+
+</project>

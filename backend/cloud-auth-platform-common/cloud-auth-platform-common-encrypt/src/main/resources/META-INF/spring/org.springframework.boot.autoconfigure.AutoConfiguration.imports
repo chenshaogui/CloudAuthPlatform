@@ -1,0 +1,2 @@
+io.gitee.chenshaogui.cloudauth.common.encrypt.config.EncryptorAutoConfiguration
+io.gitee.chenshaogui.cloudauth.common.encrypt.config.ApiDecryptAutoConfiguration

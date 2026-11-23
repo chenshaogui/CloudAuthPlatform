@@ -1,0 +1,1 @@
+customDubboLoadBalancer=io.gitee.chenshaogui.cloudauth.common.loadbalance.core.CustomDubboLoadBalancer

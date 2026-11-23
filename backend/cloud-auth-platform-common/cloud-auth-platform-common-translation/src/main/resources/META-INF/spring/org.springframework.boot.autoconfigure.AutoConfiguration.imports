@@ -1,0 +1,6 @@
+io.gitee.chenshaogui.cloudauth.common.translation.config.TranslationConfig
+io.gitee.chenshaogui.cloudauth.common.translation.core.impl.DeptNameTranslationImpl
+io.gitee.chenshaogui.cloudauth.common.translation.core.impl.DictTypeTranslationImpl
+io.gitee.chenshaogui.cloudauth.common.translation.core.impl.OssUrlTranslationImpl
+io.gitee.chenshaogui.cloudauth.common.translation.core.impl.UserNameTranslationImpl
+io.gitee.chenshaogui.cloudauth.common.translation.core.impl.NicknameTranslationImpl

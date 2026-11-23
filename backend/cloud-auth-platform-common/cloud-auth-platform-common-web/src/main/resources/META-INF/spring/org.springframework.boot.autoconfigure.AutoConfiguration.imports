@@ -1,0 +1,4 @@
+io.gitee.chenshaogui.cloudauth.common.web.config.FilterConfig
+io.gitee.chenshaogui.cloudauth.common.web.config.I18nConfig
+io.gitee.chenshaogui.cloudauth.common.web.config.UndertowConfig
+io.gitee.chenshaogui.cloudauth.common.web.config.ResourcesConfig

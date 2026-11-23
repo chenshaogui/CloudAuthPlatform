@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>统一授权认证平台 SDK · 客户端接入帮助文档</title>
+<style>
+  :root{
+    --primary:#2f6fed; --primary-d:#1f55c4; --bg:#f5f7fa; --panel:#fff;
+    --text:#1f2733; --muted:#6b7785; --border:#e3e8ef; --code-bg:#f3f5f9;
+    --tag-get:#1f9d55; --tag-post:#2f6fed; --tag-req:#e8590c; --tag-opt:#868e96;
+    --login-y:#b8860b; --login-n:#1f9d55; --sidebar:#1b2330; --sidebar-t:#c7d2e0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);font-size:14px;line-height:1.7}
+  a{color:var(--primary);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code{background:var(--code-bg);padding:1px 6px;border-radius:4px;font-family:"SFMono-Regular",Consolas,Menlo,monospace;font-size:12.5px;color:#c0341d}
+
+  /* Layout */
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:280px;background:var(--sidebar);color:var(--sidebar-t);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;padding:18px 0}
+  .sidebar .brand{padding:0 22px 16px;font-size:16px;font-weight:700;color:#fff;line-height:1.4;border-bottom:1px solid #2c3545;margin-bottom:10px}
+  .sidebar .brand small{display:block;font-size:11px;font-weight:400;color:#8aa0bd;margin-top:4px}
+  .sidebar .nav a{display:block;padding:8px 22px;color:var(--sidebar-t);font-size:13.5px;border-left:3px solid transparent}
+  .sidebar .nav a:hover{background:#252f40;color:#fff;text-decoration:none}
+  .sidebar .nav a.active{background:#252f40;color:#fff;border-left-color:var(--primary)}
+  .sidebar .nav .grp{font-size:11px;color:#6f829c;padding:14px 22px 4px;text-transform:uppercase;letter-spacing:.5px}
+  .sidebar .nav .nav-grp{margin:1px 0}
+  .sidebar .nav .nav-hd{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 22px;color:var(--sidebar-t);font-size:13.5px;cursor:pointer;border-left:3px solid transparent;user-select:none}
+  .sidebar .nav .nav-hd:hover{background:#252f40;color:#fff}
+  .sidebar .nav .nav-hd .caret{font-size:10px;color:#8aa0bd;transition:transform .15s}
+  .sidebar .nav .nav-grp.open .nav-hd .caret{transform:rotate(90deg)}
+  .sidebar .nav .nav-body{display:none}
+  .sidebar .nav .nav-grp.open .nav-body{display:block}
+  .sidebar .nav .nav-body a{padding:5px 22px 5px 38px;font-size:12.5px;color:#a9bad2;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sidebar .nav .nav-body a:hover{color:#fff}
+  .sidebar .nav .nav-body a .m{display:inline-block;font-size:10px;font-weight:700;margin-right:6px;color:#6f829c}
+  .sidebar .search{padding:0 16px 12px}
+  .sidebar .search input{width:100%;padding:8px 10px;border-radius:6px;border:1px solid #34405a;background:#121822;color:#fff;font-size:13px}
+  .sidebar .search input::placeholder{color:#6f829c}
+
+  .main{margin-left:280px;flex:1;padding:32px 40px 80px;max-width:1080px}
+  .hero{background:linear-gradient(135deg,#2f6fed,#5b8def);color:#fff;border-radius:12px;padding:26px 30px;margin-bottom:26px}
+  .hero h1{margin:0 0 6px;font-size:22px}
+  .hero p{margin:0;opacity:.92;font-size:13.5px}
+  .hero .chips{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .hero .chip{background:rgba(255,255,255,.18);padding:4px 12px;border-radius:20px;font-size:12px}
+
+  section{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:22px 26px;margin-bottom:22px;scroll-margin-top:16px}
+  section > h2{margin:0 0 4px;font-size:19px;display:flex;align-items:center;gap:10px}
+  section > h2 .num{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:0 0 auto}
+  section > .sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+  h3{border-left:4px solid var(--primary);padding-left:10px;margin:22px 0 10px;font-size:16px}
+
+  /* Tables */
+  table{border-collapse:collapse;width:100%;margin:8px 0 6px;font-size:13px}
+  th,td{border:1px solid var(--border);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:#f0f3f8;font-weight:600}
+  tr:nth-child(even) td{background:#fafbfd}
+  td code{white-space:nowrap}
+  .api-title{font-weight:600;color:#33405a;margin:14px 0 2px;font-size:13px}
+  .api-title .rt{color:var(--muted);font-weight:400}
+
+  /* Tags */
+  .tag{display:inline-block;padding:1px 8px;border-radius:4px;color:#fff;font-size:11.5px;font-weight:600;letter-spacing:.3px}
+  .t-get{background:var(--tag-get)} .t-post{background:var(--tag-post)}
+  .req{color:#e8590c;font-weight:600} .opt{color:#868e96} .yes{color:#e8590c;font-weight:600}
+  .login-y{color:var(--login-y);font-weight:600} .login-n{color:var(--login-n);font-weight:600}
+
+  .endpoint{border:1px solid var(--border);border-radius:8px;margin:16px 0;overflow:hidden}
+  .endpoint .head{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f7f9fc;flex-wrap:wrap}
+  .endpoint .path{font-family:monospace;font-weight:600;color:#243}
+  .endpoint .body{padding:4px 14px 14px}
+  .endpoint .desc{color:#42505f;margin:8px 0}
+
+  pre{background:#0f1620;color:#e6edf3;padding:14px 16px;border-radius:8px;overflow:auto;font-size:12.5px;line-height:1.55}
+  pre code{background:none;color:inherit;padding:0}
+  .note{border:1px solid #cfe2ff;background:#f0f7ff;padding:10px 14px;border-radius:8px;font-size:13px;margin:12px 0}
+  .note.warn{border-color:#ffe3c2;background:#fff7ee}
+  .note.ok{border-color:#c7ecd1;background:#f1fbf4}
+
+  @media(max-width:880px){.main{margin-left:0;padding:18px}.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:none;z-index:50}.menu-btn{display:block!important}}
+  .menu-btn{display:none;position:fixed;top:12px;left:12px;z-index:60;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:16px;cursor:pointer}
+  .hl{background:#fff3bf!important}
+  .hidden{display:none!important}
+  .footer{color:var(--muted);font-size:12px;text-align:center;padding:10px}
+</style>
+</head>
+<body>
+<button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">统一授权认证 SDK<small>客户端接入帮助文档 · v1.5.11</small></div>
+    <div class="search"><input id="q" placeholder="搜索接口 / 字段 / 方法…" oninput="doSearch()"></div>
+    <nav class="nav" id="nav">
+      <a href="#overview">项目概述</a>
+      <div class="grp">一、快速接入</div>
+      <a href="#dep">Maven 依赖</a>
+      <a href="#config">application.yml 配置</a>
+      <div class="grp">二、接入方式</div>
+      <a href="#mode-loginonly">方式一：仅单点登录</a>
+      <a href="#mode-full">方式二：完全接入（推荐）</a>
+      <div class="grp">三、Controller 接口文档</div>
+      <div id="nav-ctl-sso"></div>
+      <div id="nav-ctl-auth"></div>
+      <div id="nav-ctl-oss"></div>
+      <div class="grp">四、CloudPlatformHelper 工具类</div>
+      <div id="nav-helper"></div>
+      <div class="grp">五、前端对接方式</div>
+      <a href="#frontend">前端对接（ticket 防重复消费）</a>
+      <div class="grp">六、配置与速查</div>
+      <a href="#cache">缓存档位速查</a>
+      <a href="#whitelist">白名单与 CORS</a>
+      <a href="#faq">常见问题</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <h1>客户端接入帮助文档</h1>
+      <p>本页随 SDK 打包（位于 classpath 静态资源）。是否对外暴露由接入系统自行决定：需客户端放开 <code style="color:#fff;background:rgba(255,255,255,.2)">/sdk-help.html</code> 的访问（加入白名单 / 静态资源映射）后方可查看。涵盖 sa-token 集成配置、所有对外 Controller 接口契约（逐字段参数与返回值）、以及 <code style="color:#fff;background:rgba(255,255,255,.2)">CloudPlatformHelper</code> 调用工具说明。</p>
+      <div class="chips">
+        <span class="chip">基于 sa-token-sso</span>
+        <span class="chip">JWT 模式对齐</span>
+        <span class="chip">权限自动同步</span>
+        <span class="chip">免登 / 注册 / 验证码</span>
+        <span class="chip">文件 / 公告 / 区域</span>
+      </div>
+    </div>
+
+    <section id="overview">
+      <h2><span class="num">i</span>项目概述</h2>
+      <p class="sub"><code>cloud-auth-client-oauth</code> 是统一授权认证中心的客户端 SDK，以插件方式集成到业务系统。</p>
+      <p>它负责：</p>
+      <ul>
+        <li>与认证中心完成 SSO 单点登录（基于 sa-token-sso）；</li>
+        <li>从认证中心统一拉取用户、菜单路由、机构、权限码、字典、参数配置等数据；</li>
+        <li>提供 <code>@SaCheckPermission</code> / <code>@SaCheckRole</code> 等注解的本地 O(1) 校验；</li>
+        <li>自动跟随认证中心的权限变更（节流式后台同步）。</li>
+      </ul>
+      <div class="note">SDK 已内置 <code>CloudTokenSsoClientController</code>(<code>/sso</code>)、<code>CloudAuthCenterController</code>(<code>/authCenter</code>)、<code>CloudOssController</code>(<code>/authCenter/oss</code>) 三组端点，业务方<b>无需手写</b>；如需自定义返回结构（如包装为项目内的 <code>R&lt;T&gt;</code>）或扩展 Swagger 注解，在自身工程定义同名 Controller 即可（Spring 优先加载业务方 Bean）。</div>
+    </section>
+
+    <section id="dep">
+      <h2><span class="num">1</span>Maven 依赖</h2>
+      <p class="sub">本 SDK 的 <code>artifactId</code> 统一用占位符 <code>${cloud-auth-client-oauth.version}</code> 表示（当前值为 <code>1.5.11</code>，与 pom.xml 中 <code>io.gitee.chenshaogui.cloudauth:cloud-auth-client-oauth</code> 版本一致）。</p>
+      <h3>SpringBoot 2.x 项目</h3>
+      <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;io.gitee.chenshaogui.cloudauth&lt;/groupId&gt;
+  &lt;artifactId&gt;cloud-auth-client-oauth&lt;/artifactId&gt;
+  &lt;version&gt;${cloud-auth-client-oauth.version}&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;cn.dev33&lt;/groupId&gt;
+  &lt;artifactId&gt;sa-token-spring-boot-starter&lt;/artifactId&gt;
+  &lt;version&gt;1.44.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+      <h3>SpringBoot 3.x 项目（jakarta.servlet）</h3>
+      <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;io.gitee.chenshaogui.cloudauth&lt;/groupId&gt;
+  &lt;artifactId&gt;cloud-auth-client-oauth&lt;/artifactId&gt;
+  &lt;version&gt;${cloud-auth-client-oauth.version}&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!-- SDK 内部 sa-token-spring-boot-starter 为 optional 不向下传递，Boot3 需显式引入 jakarta 版 --&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;cn.dev33&lt;/groupId&gt;
+  &lt;artifactId&gt;sa-token-spring-boot3-starter&lt;/artifactId&gt;
+  &lt;version&gt;1.44.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+      <div class="note warn">若业务项目<b>未启用 Redis</b>，需排除 <code>sa-token-redis-template</code>，否则启动后缓存降级为「不缓存、每次远程调用」（不影响可用性，仅启动日志有提示）。</div>
+    </section>
+
+    <section id="config">
+      <h2><span class="num">2</span>application.yml 配置</h2>
+      <p class="sub">全部配置都挂在 <code>sa-token</code> 命名空间下（与 sa-token 官方共享前缀）。一部分由 sa-token 官方 <code>SaTokenConfig</code> / <code>SaSsoClientConfig</code> 解析，一部分由本 SDK 的 <code>CloudProperties</code>、环境后处理器、CORS 与缓存模块解析。下表按「归属分组」逐一列出 <b>SDK 会读取的全部配置项</b>。</p>
+
+      <h3>配置项一览（全部）</h3>
+      <table>
+        <tr><th>分组</th><th>配置项</th><th>类型</th><th>默认值</th><th>必填</th><th>说明</th></tr>
+
+        <tr><td rowspan="6">sa-token 官方<br>(SaTokenConfig)</td>
+          <td><code>sa-token.token-name</code></td><td>String</td><td><code>Authorization</code></td><td><span class="opt">否</span></td><td>token / cookie 名称</td></tr>
+        <tr><td><code>sa-token.check-same-token</code></td><td>boolean</td><td><code>false</code></td><td><span class="opt">否</span></td><td>开启内网服务调用鉴权（防越权调用）</td></tr>
+        <tr><td><code>sa-token.is-log</code></td><td>boolean</td><td><code>false</code></td><td><span class="opt">否</span></td><td>打印 sa-token 操作日志</td></tr>
+        <tr><td><code>sa-token.dynamic-active-timeout</code></td><td>boolean</td><td>SDK 自动注入 <code>true</code></td><td><span class="opt">否</span></td><td>开启动态活跃超时，避免 token 被判定「已冻结」（否则抛 NotLoginException）</td></tr>
+        <tr><td><code>sa-token.jwt-secret-key</code></td><td>String</td><td>SDK 自动注入 <code>abcdefghijklmnopqrstuvwxyz</code></td><td><span class="opt">否</span></td><td>JWT 密钥，<b>必须与认证中心完全一致</b>，否则客户端 token 无法被解析</td></tr>
+        <tr><td><code>sa-token.only-login</code></td><td>boolean</td><td><code>false</code></td><td><span class="req">方式一必填</span></td><td>仅做单点登录（不接入认证中心用户/权限体系）</td></tr>
+
+        <tr><td rowspan="5">sa-token 官方<br>(SaSsoClientConfig)</td>
+          <td><code>sa-token.sso-client.client</code></td><td>String</td><td>无</td><td><span class="req">是</span></td><td>应用标识（由认证中心分配）</td></tr>
+        <tr><td><code>sa-token.sso-client.server-url</code></td><td>String</td><td>无</td><td><span class="req">是</span></td><td>认证中心地址（统一登录 / API 调用根地址）</td></tr>
+        <tr><td><code>sa-token.sso-client.auth-url</code></td><td>String</td><td>无</td><td><span class="req">方式一必填</span></td><td>登录后回跳地址（仅单点登录模式使用）</td></tr>
+        <tr><td><code>sa-token.sso-client.is-http</code></td><td>boolean</td><td><code>false</code></td><td><span class="opt">否</span></td><td>使用 HTTP 校验 ticket（推荐 true）</td></tr>
+        <tr><td><code>sa-token.sso-client.secret-key</code></td><td>String</td><td>无</td><td><span class="opt">否*</span></td><td>API 调用秘钥（<code>/sso/openProxy</code>、pushS 总线等需验签时必填）</td></tr>
+
+        <tr><td rowspan="4">CloudProperties<br>(SDK 扩展)</td>
+          <td><code>sa-token.permit-paths</code></td><td>List&lt;String&gt;</td><td><code>[]</code></td><td><span class="opt">否</span></td><td>追加登录白名单（Ant 风格，追加到 SDK 硬默认白名单之后）</td></tr>
+        <tr><td><code>sa-token.expose-controller</code></td><td>Boolean</td><td><code>true</code></td><td><span class="opt">否</span></td><td>SDK Controller（<code>/sso/**</code>、<code>/authCenter/**</code>）注册开关；微服务仅入口模块开启</td></tr>
+        <tr><td><code>sa-token.register-role-keys</code></td><td>List&lt;String&gt;</td><td><code>[]</code></td><td><span class="opt">否</span></td><td>用户注册后自动绑定角色标识（<code>sys_role.role_key</code>）</td></tr>
+        <tr><td><code>sa-token.custom-properties</code></td><td>Map&lt;String,String&gt;</td><td><code>{}</code></td><td><span class="opt">否</span></td><td>自定义业务参数键值对，由 <code>CloudPlatformHelper</code> 读取</td></tr>
+
+        <tr><td rowspan="4">CORS<br>(CloudTokenClientConfigure)</td>
+          <td><code>sa-token.client.cors.allowed-origins</code></td><td>String</td><td><code>*</code></td><td><span class="opt">否</span></td><td>允许的跨域源（逗号分隔）</td></tr>
+        <tr><td><code>sa-token.client.cors.allowed-methods</code></td><td>String</td><td><code>POST, GET, OPTIONS, DELETE</code></td><td><span class="opt">否</span></td><td>允许的请求方法</td></tr>
+        <tr><td><code>sa-token.client.cors.allowed-headers</code></td><td>String</td><td><code>*</code></td><td><span class="opt">否</span></td><td>允许的请求头</td></tr>
+        <tr><td><code>sa-token.client.cors.max-age</code></td><td>String</td><td><code>3600</code></td><td><span class="opt">否</span></td><td>预检请求缓存时间（秒）</td></tr>
+
+        <tr><td rowspan="4">Cache<br>(CloudPlatformHelper)</td>
+          <td><code>sa-token.cache.ttl-seconds</code></td><td>int</td><td><code>20</code>（最小 5）</td><td><span class="opt">否</span></td><td>权限相关缓存 TTL（秒）</td></tr>
+        <tr><td><code>sa-token.cache.reference-ttl-seconds</code></td><td>int</td><td><code>300</code></td><td><span class="opt">否</span></td><td>参考数据缓存 TTL（秒）</td></tr>
+        <tr><td><code>sa-token.cache.user-ttl-seconds</code></td><td>int</td><td><code>60</code></td><td><span class="opt">否</span></td><td>用户信息缓存 TTL（秒）</td></tr>
+        <tr><td><code>sa-token.cache.&lt;apiName&gt;.ttl-seconds</code></td><td>int</td><td>取对应档位默认</td><td><span class="opt">否</span></td><td>单接口特例 TTL，如 <code>sa-token.cache.getDictDataByType.ttl-seconds: 600</code></td></tr>
+      </table>
+      <div class="note">带 <code>*</code> 的 <code>secret-key</code>：仅做基础单点登录可不配；一旦调用需验签的开放接口（<code>/sso/openProxy</code>、免登注册/短信等 pushS 总线）则必须配置，否则验签失败。</div>
+
+      <div class="note ok">自 1.2.0 起 SDK 自动注入（无需配置，可覆盖）：<code>sa-token.dynamic-active-timeout=true</code>（修复 token 被冻结）、<code>sa-token.jwt-secret-key=abcdefghijklmnopqrstuvwxyz</code>（必须与认证中心一致）。</div>
+      <p>上述各配置项在不同接入方式下的完整 <code>application.yml</code> 模板，见下方「<a href="#mode-loginonly">方式一：仅单点登录</a> / <a href="#mode-full">方式二：完全接入（推荐）</a>」章节。</p>
+    </section>
+
+    <section id="mode-loginonly">
+      <h2><span class="num">3</span>方式一：仅单点登录（老项目保留自有用户体系）</h2>
+      <p class="sub">老项目已有自己的用户 / 角色 / 权限体系，只借用统一认证平台的「统一登录」能力；登录后用户信息、菜单、权限仍由业务系统自身管理。</p>
+      <p><b>关键配置</b>：<code>sa-token.only-login: true</code>（其余按 sa-token 官方 SSO 客户端配置即可）。</p>
+      <div class="note">方式一推荐使用 <code>getUserInfoByTicketWithoutLogin(ticket)</code> 拉取用户信息（<b>不消费 ticket、不自动登录</b>）；误用 <code>getUserInfoByTicket(ticket)</code> 会消费 ticket 并自动完成本地登录。</div>
+      <h3>application.yml 配置示例</h3>
+      <pre><code>sa-token:
+  token-name: Authorization
+  only-login: true                     # 仅做单点登录（方式一必填）
+  sso-client:
+    client: b3ed3d93b017ba5921e014efc78a6ad6
+    server-url: https://example.com/uaa-gateway/auth
+    auth-url: https://example.com/etc2-html/securitySystem/index.html#/ssologin
+    is-http: true
+    secret-key: qaJ5LPLxCPSZTtsfqTB8xkQC7MOTyqhx0KGJEhy84Fo</code></pre>
+    </section>
+
+    <section id="mode-full">
+      <h2><span class="num">4</span>方式二：完全接入（推荐）</h2>
+      <p class="sub">客户端所有用户、角色、菜单、权限码均由认证中心统一管理，业务系统只做渲染与业务处理。推荐新项目或直接重构接入的项目使用。</p>
+      <p><b>关键配置</b>：不配置 <code>only-login</code> 或显式 <code>only-login: false</code>，并完整配置 <code>sso-client</code> 及 sa-token 相关项。</p>
+      <h3>application.yml 配置示例</h3>
+      <pre><code>sa-token:
+  token-name: Authorization            # token / cookie 名称
+  check-same-token: true               # 开启内网服务调用鉴权
+  is-log: true                         # 打印操作日志
+  sso-client:
+    client: sso-client3                # 应用标识（必填，由认证中心分配）
+    server-url: http://sa-sso-server.com:9000  # 认证中心地址
+    is-http: true                      # 使用 HTTP 校验 ticket
+    secret-key: SSO-C3-kQwIOrYvnXmSDkwEiFngrKidMcdrgKor  # API 调用秘钥
+  # 微服务多模块时，仅登录入口模块（如 system）开启 Controller，其余关闭：
+  expose-controller: true</code></pre>
+    </section>
+
+    <!-- ============ /sso ============ -->
+    <section id="ctl-sso">
+      <h2><span class="num">5</span>/sso 登录与免登接口</h2>
+      <p class="sub">Controller：<code>CloudTokenSsoClientController</code>。类标注 <code>@SaIgnore</code> —— <b class="login-n">登录前即可调用</b>。微服务下受 <code>sa-token.expose-controller</code> 开关控制（默认开启）。</p>
+
+      <h3>统一响应结构（SaResult）</h3>
+      <table>
+        <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        <tr><td><code>code</code></td><td>Integer</td><td>状态码，<code>200</code> 表示成功，其余为业务 / 鉴权错误码</td></tr>
+        <tr><td><code>msg</code></td><td>String</td><td>提示信息（错误时为错误原因）</td></tr>
+        <tr><td><code>data</code></td><td>Object</td><td>业务数据，结构见各接口「返回参数」</td></tr>
+      </table>
+      <div class="note">下文「返回参数」均指 <code>SaResult.data</code> 的内容。所有 <code>POST</code> 业务接口请求体为 <code>application/json</code>。</div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/getSsoAuthUrl</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">返回认证中心登录地址（前端跳转用）。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>clientLoginUrl</code></td><td>String</td><td><span class="opt">否</span></td><td>票据投递地址（登录后回跳）；为空时 SDK 按 clientId 自动拉取默认地址</td></tr>
+            <tr><td><code>back</code></td><td>String</td><td><span class="opt">否</span></td><td>登录成功后再次回跳的业务页面</td></tr>
+            <tr><td><code>encrypt</code></td><td>boolean</td><td><span class="opt">否</span></td><td>默认 false；true 时返回 <code>?auth_request=xxx</code> 密文地址</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>data</code></td><td>String</td><td>可直接跳转的认证中心登录地址</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/getEncryptedSsoAuthUrl</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">返回 client/redirect 已加密为 <code>?auth_request=xxx</code> 的登录地址（保留原「已登录」确认弹窗）。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>clientLoginUrl</code></td><td>String</td><td><span class="opt">否</span></td><td>票据投递地址；为空时自动取默认地址</td></tr>
+            <tr><td><code>back</code></td><td>String</td><td><span class="opt">否</span></td><td>登录成功后回跳的业务页面</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td><code>data</code></td><td>String</td><td>加密后的登录地址</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/getEncryptedSsoAuthUrlForCenter</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">加密地址，授权模式固定 <code>center</code>（认证中心已登录时跳过确认弹窗直接进入授权中心）。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>clientLoginUrl</code></td><td>String</td><td><span class="opt">否</span></td><td>票据投递地址</td></tr>
+            <tr><td><code>back</code></td><td>String</td><td><span class="opt">否</span></td><td>登录成功后回跳地址</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>String</td><td>加密后的登录地址（center 模式）</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/getEncryptedSsoAuthUrlForSilent</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">加密地址，授权模式固定 <code>silent</code>（已登录免确认直接授权并回跳）。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>clientLoginUrl</code></td><td>String</td><td><span class="opt">否</span></td><td>票据投递地址</td></tr>
+            <tr><td><code>back</code></td><td>String</td><td><span class="opt">否</span></td><td>登录成功后回跳地址</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>String</td><td>加密后的登录地址（silent 模式）</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/doLoginByTicket</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">根据 ticket 完成本地登录：<b>消费 ticket 并自动 <code>StpUtil.login</code></b>。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>ticket</code></td><td>String</td><td><span class="req">是</span></td><td>授权码（认证中心回调带回）</td></tr>
+          </table>
+          <p class="api-title">返回参数 <span class="rt">(CloudLoginVo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>accessToken</code></td><td>String</td><td>子系统本地 token（登录成功后填写）</td></tr>
+            <tr><td><code>expireIn</code></td><td>Long</td><td>accessToken 有效期（秒）</td></tr>
+            <tr><td><code>clientId</code></td><td>String</td><td>应用 ID</td></tr>
+            <tr><td><code>refreshToken</code></td><td>String</td><td>预留字段，恒为 null（续期用 /authCenter/refreshToken）</td></tr>
+            <tr><td><code>refreshExpireIn</code></td><td>Long</td><td>预留字段，恒为 null</td></tr>
+            <tr><td><code>scope</code></td><td>String</td><td>预留字段，恒为 null</td></tr>
+            <tr><td><code>openid</code></td><td>String</td><td>仅微信小程序等透传 openid 的场景有值</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/login</span><span class="login-n">免登录</span></div>
+        <div class="body"><p class="desc">跳转认证中心（由 SDK 生成重定向）。无请求参数，返回重定向对象。</p></div>
+      </div>
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/logout</span><span class="login-n">免登录</span></div>
+        <div class="body"><p class="desc">全局注销，通知认证中心踢下线其他已登录应用。无请求参数，返回重定向 / 对象。</p></div>
+      </div>
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/logoutCall</span><span class="login-n">免登录</span></div>
+        <div class="body"><p class="desc">单点注销回调（认证中心回调客户端，<b>必须保留</b>，否则全局注销失败）。无请求参数。</p></div>
+      </div>
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/pushC</span><span class="login-n">免登录</span></div>
+        <div class="body"><p class="desc">接收消息推送（认证中心回调客户端，<b>必须保留</b>）。无请求参数。</p></div>
+      </div>
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/logoutByAlone</span><span class="login-n">免登录</span></div>
+        <div class="body"><p class="desc">当前应用独自注销（不影响其他已登录应用）。无请求参数。</p></div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/openProxy</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">认证中心开放接口<b>通用直连透传</b>（登录前后均可）。path 必须以 <code>/</code> 开头，不允许协议头与 <code>..</code>（SSRF 防护）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudOpenApiBo, application/json)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>method</code></td><td>String</td><td><span class="opt">否</span></td><td>HTTP 方法（GET/POST/PUT/DELETE），默认 POST</td></tr>
+            <tr><td><code>path</code></td><td>String</td><td><span class="req">是</span></td><td>相对 server-url 的接口路径，如 <code>/api/auth/register</code></td></tr>
+            <tr><td><code>params</code></td><td>Map&lt;String,Object&gt;</td><td><span class="opt">否</span></td><td>query / 表单参数（GET 拼 query；POST/PUT 未传 body 时表单提交）</td></tr>
+            <tr><td><code>body</code></td><td>Object</td><td><span class="opt">否</span></td><td>JSON 请求体（非 null 时忽略 params）</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td><code>data</code></td><td>Object</td><td>认证中心原始 code/msg/data 原样透传</td></tr></table>
+        </div>
+      </div>
+
+      <h3>免登 / 注册 / 验证码（走 pushS 总线，自动验签，无需 RSA 公钥）</h3>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/sso/captcha</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">获取图形验证码。无请求参数。</p>
+          <p class="api-title">返回参数 <span class="rt">(CloudCaptchaVo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>captchaEnabled</code></td><td>Boolean</td><td>是否开启图形验证码；false 时前端可跳过输入框</td></tr>
+            <tr><td><code>uuid</code></td><td>String</td><td>验证码唯一标识，登录时随 body 回传</td></tr>
+            <tr><td><code>img</code></td><td>String</td><td>base64 图片，可直接 <code>&lt;img src="data:image/png;base64,..."&gt;</code></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/loginByPassword</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">账号密码登录（认证中心开启图形验证码时需带 code/uuid），成功后以一次性 ticket 桥接本地登录。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudLoginBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>username</code></td><td>String</td><td><span class="req">是</span></td><td>用户名</td></tr>
+            <tr><td><code>password</code></td><td>String</td><td><span class="req">是</span></td><td>用户密码</td></tr>
+            <tr><td><code>code</code></td><td>String</td><td><span class="opt">否</span></td><td>图形验证码（认证中心开启验证码时必填）</td></tr>
+            <tr><td><code>uuid</code></td><td>String</td><td><span class="opt">否</span></td><td>验证码唯一标识（来自 /sso/captcha）</td></tr>
+            <tr><td><code>grantType</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 <code>password</code>（SDK 自动兜底）</td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000（SDK 自动兜底）</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>CloudLoginVo</td><td>含 accessToken / expireIn / clientId 等（同 doLoginByTicket）</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/loginByPasswordNoCaptcha</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">账号密码登录 —— <b>免图形验证码</b>（走服务端独立 handler，客户端无法用 body 绕过 /sso/loginByPassword 的验证码）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudLoginNoCaptchaBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>username</code></td><td>String</td><td><span class="req">是</span></td><td>用户名</td></tr>
+            <tr><td><code>password</code></td><td>String</td><td><span class="req">是</span></td><td>用户密码</td></tr>
+            <tr><td><code>grantType</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 <code>password</code></td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>CloudLoginVo</td><td>子系统本地 token 信息</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/loginByPhone</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">手机号 + 短信验证码登录。需先调 /sso/sendSmsCodeByPhone 收码。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudPhoneLoginBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>phonenumber</code></td><td>String</td><td><span class="req">是</span></td><td>手机号</td></tr>
+            <tr><td><code>smsCode</code></td><td>String</td><td><span class="req">是</span></td><td>短信验证码</td></tr>
+            <tr><td><code>grantType</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 <code>sms</code></td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>CloudLoginVo</td><td>子系统本地 token 信息</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/loginByWechat</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">微信小程序登录（wx.login 拿临时 code 后调用）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudWechatLoginBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>xcxCode</code></td><td>String</td><td><span class="req">是</span></td><td>小程序 wx.login 临时凭证（字段名是 xcxCode，非 code）</td></tr>
+            <tr><td><code>appid</code></td><td>String</td><td><span class="opt">否</span></td><td>小程序 appid，不填由认证中心按 client 默认凭证解析</td></tr>
+            <tr><td><code>grantType</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 <code>xcx</code></td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>CloudLoginVo</td><td>子系统本地 token 信息（openid 场景可能有值）</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/register</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">用户注册（通用超集）：图形码或短信码共用 <code>code</code> 字段，服务端按是否存在 phonenumber 决定校验方式。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudRegisterBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>username</code></td><td>String</td><td><span class="req">是</span></td><td>用户名</td></tr>
+            <tr><td><code>password</code></td><td>String</td><td><span class="req">是</span></td><td>用户密码</td></tr>
+            <tr><td><code>phonenumber</code></td><td>String</td><td><span class="opt">否</span></td><td>手机号（短信码注册时填）</td></tr>
+            <tr><td><code>code</code></td><td>String</td><td><span class="opt">否</span></td><td>图形码 / 短信码（依场景二选一承载）</td></tr>
+            <tr><td><code>uuid</code></td><td>String</td><td><span class="opt">否</span></td><td>图形码唯一标识（短信码场景留空）</td></tr>
+            <tr><td><code>userType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户类型</td></tr>
+            <tr><td><code>userSourceType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户来源类型（写 sys_user_ext.user_source_type）</td></tr>
+            <tr><td><code>roleKeys</code></td><td>List&lt;String&gt;</td><td><span class="opt">否</span></td><td>注册后自动绑定角色标识；为空时取 <code>sa-token.register-role-keys</code></td></tr>
+            <tr><td><code>grantType</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 <code>password</code></td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功仅返回 code=200，data 为 null</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/registerByCaptcha</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">用户注册 —— 图形验证码场景（先调 /sso/captcha 拿 uuid 与图片）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudRegisterByCaptchaBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>username</code></td><td>String</td><td><span class="req">是</span></td><td>用户名</td></tr>
+            <tr><td><code>password</code></td><td>String</td><td><span class="req">是</span></td><td>用户密码</td></tr>
+            <tr><td><code>code</code></td><td>String</td><td><span class="req">是</span></td><td>图形验证码（用户输入）</td></tr>
+            <tr><td><code>uuid</code></td><td>String</td><td><span class="req">是</span></td><td>图形验证码唯一标识（来自 /sso/captcha）</td></tr>
+            <tr><td><code>userType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户类型</td></tr>
+            <tr><td><code>userSourceType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户来源类型</td></tr>
+            <tr><td><code>roleKeys</code></td><td>List&lt;String&gt;</td><td><span class="opt">否</span></td><td>注册后自动绑定角色标识</td></tr>
+            <tr><td><code>grantType</code> / <code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 password / 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功返回 code=200</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/registerBySms</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">用户注册 —— 手机号 + 短信验证码场景（先调 /sso/sendSmsCodeForRegister 收码，短信码放 <code>code</code> 字段）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudRegisterBySmsBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>username</code></td><td>String</td><td><span class="req">是</span></td><td>用户名</td></tr>
+            <tr><td><code>password</code></td><td>String</td><td><span class="req">是</span></td><td>用户密码</td></tr>
+            <tr><td><code>phonenumber</code></td><td>String</td><td><span class="req">是</span></td><td>手机号（待注册号码）</td></tr>
+            <tr><td><code>code</code></td><td>String</td><td><span class="req">是</span></td><td>短信验证码（6 位，字段名是 code 非 smsCode）</td></tr>
+            <tr><td><code>userType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户类型</td></tr>
+            <tr><td><code>userSourceType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户来源类型</td></tr>
+            <tr><td><code>roleKeys</code></td><td>List&lt;String&gt;</td><td><span class="opt">否</span></td><td>注册后自动绑定角色标识</td></tr>
+            <tr><td><code>grantType</code> / <code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 password / 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功返回 code=200</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/sendSmsCode</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">发送短信验证码（用户名 + 密码校验维度，防止任意枚举手机号）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudSendSmsBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>username</code></td><td>String</td><td><span class="req">是</span></td><td>用户名</td></tr>
+            <tr><td><code>password</code></td><td>String</td><td><span class="req">是</span></td><td>用户密码</td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功返回 code=200</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/sendSmsCodeByPhone</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">发送短信验证码（仅手机号，用于手机号登录；号码需已注册）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudSendSmsByPhoneBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>phonenumber</code></td><td>String</td><td><span class="req">是</span></td><td>手机号（已注册）</td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功返回 code=200</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/sendSmsCodeForRegister</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">发送短信验证码（注册场景，面向<b>尚未注册</b>的手机号，不校验存在性）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudSendSmsForRegisterBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>phonenumber</code></td><td>String</td><td><span class="req">是</span></td><td>手机号（待注册号码）</td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功返回 code=200</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/sendSmsCodeByReset</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">发送短信验证码（重置密码场景，发送前校验新密码强度）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudSendSmsByResetBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>username</code></td><td>String</td><td><span class="req">是</span></td><td>用户名</td></tr>
+            <tr><td><code>oldPassword</code></td><td>String</td><td><span class="req">是</span></td><td>旧密码</td></tr>
+            <tr><td><code>newPassword</code></td><td>String</td><td><span class="req">是</span></td><td>新密码</td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功返回 code=200</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/sso/resetPassword</span><span class="login-n">免登录</span></div>
+        <div class="body">
+          <p class="desc">忘记密码 / 重置密码（凭手机号 + 短信验证码提交新密码）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudResetPasswordBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>phonenumber</code></td><td>String</td><td><span class="req">是</span></td><td>手机号（收码号码，用于定位用户）</td></tr>
+            <tr><td><code>smsCode</code></td><td>String</td><td><span class="req">是</span></td><td>短信验证码</td></tr>
+            <tr><td><code>newPassword</code></td><td>String</td><td><span class="req">是</span></td><td>新密码</td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功返回 code=200</td></tr></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ /authCenter ============ -->
+    <section id="ctl-auth">
+      <h2><span class="num">6</span>/authCenter 登录后接口</h2>
+      <p class="sub">Controller：<code>CloudAuthCenterController</code>。类级<b>未</b>标注 <code>@SaIgnore</code>，由全局过滤器要求<b class="login-y">登录后</b>调用（未登录返回 401）。响应结构同 <code>SaResult</code>。</p>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getMenuRouters</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">获取当前登录用户的路由信息。无请求参数。</p>
+          <p class="api-title">返回参数 <span class="rt">(List&lt;CloudRouterVo&gt;)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>name</code></td><td>String</td><td>路由名字</td></tr>
+            <tr><td><code>path</code></td><td>String</td><td>路由地址</td></tr>
+            <tr><td><code>hidden</code></td><td>Boolean</td><td>是否隐藏（true 不在侧边栏出现）</td></tr>
+            <tr><td><code>redirect</code></td><td>String</td><td>重定向地址</td></tr>
+            <tr><td><code>component</code></td><td>String</td><td>组件地址</td></tr>
+            <tr><td><code>query</code></td><td>String</td><td>路由参数（JSON 串）</td></tr>
+            <tr><td><code>alwaysShow</code></td><td>Boolean</td><td>是否总是显示根路由</td></tr>
+            <tr><td><code>meta</code></td><td>CloudMetaVo</td><td>路由元信息（标题、图标、权限等）</td></tr>
+            <tr><td><code>children</code></td><td>List&lt;CloudRouterVo&gt;</td><td>子路由</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getLoginUserInfo</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">获取当前登录用户信息（含用户、权限码、角色）。无请求参数。</p>
+          <p class="api-title">返回参数 <span class="rt">(CloudUserInfoVo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>user</code></td><td>CloudUserVo</td><td>用户基本信息（见下表）</td></tr>
+            <tr><td><code>permissions</code></td><td>Set&lt;String&gt;</td><td>菜单权限码集合</td></tr>
+            <tr><td><code>roles</code></td><td>Set&lt;String&gt;</td><td>角色权限标识集合</td></tr>
+          </table>
+          <p class="api-title">CloudUserVo 字段</p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>userId</code></td><td>Long</td><td>用户 ID</td></tr>
+            <tr><td><code>deptId</code></td><td>Long</td><td>部门 ID</td></tr>
+            <tr><td><code>deptName</code></td><td>String</td><td>部门名称</td></tr>
+            <tr><td><code>userName</code></td><td>String</td><td>用户账号</td></tr>
+            <tr><td><code>nickName</code></td><td>String</td><td>用户昵称</td></tr>
+            <tr><td><code>userType</code></td><td>String</td><td>用户类型</td></tr>
+            <tr><td><code>email</code></td><td>String</td><td>邮箱</td></tr>
+            <tr><td><code>phonenumber</code></td><td>String</td><td>手机号</td></tr>
+            <tr><td><code>sex</code></td><td>String</td><td>性别（0男 1女 2未知）</td></tr>
+            <tr><td><code>status</code></td><td>String</td><td>账号状态（0正常 1停用）</td></tr>
+            <tr><td><code>desensitizeFlag</code></td><td>Integer</td><td>数据是否脱敏（0否 1是）</td></tr>
+            <tr><td><code>belongCode</code> / <code>belongName</code></td><td>String</td><td>归属地编码 / 名称</td></tr>
+            <tr><td><code>clientId</code></td><td>String</td><td>客户端 ID</td></tr>
+            <tr><td><code>postNames</code></td><td>List&lt;String&gt;</td><td>岗位名称列表</td></tr>
+            <tr><td><code>createTime</code></td><td>Date</td><td>创建时间</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/clearCache</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">清空 SDK 全部远程缓存（不影响登录态，用户无需重新登录）。无请求参数。</p>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td><code>data</code></td><td>Long</td><td>实际删除的 Redis key 数量</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getSsoUrl</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">获取鉴权中心 URL 配置（前端跳转使用）。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>clientLoginUrl</code></td><td>String</td><td><span class="opt">否</span></td><td>传入时额外返回可直接跳转的 ssoUrl</td></tr>
+            <tr><td><code>back</code></td><td>String</td><td><span class="opt">否</span></td><td>登录成功后回跳地址</td></tr>
+            <tr><td><code>encrypt</code></td><td>boolean</td><td><span class="opt">否</span></td><td>默认 false；true 时 ssoUrl 参数收进密文</td></tr>
+          </table>
+          <p class="api-title">返回参数 <span class="rt">(CloudSsoUrlVo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>client</code></td><td>String</td><td>当前客户端标识（sa-token.sso-client.client）</td></tr>
+            <tr><td><code>serverUrl</code></td><td>String</td><td>鉴权中心主机地址</td></tr>
+            <tr><td><code>authUrl</code></td><td>String</td><td>鉴权中心登录完整 URL</td></tr>
+            <tr><td><code>ssoUrl</code></td><td>String</td><td>可直接跳转的完整登录 URL（仅传 clientLoginUrl 时返回）</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/updatePassword</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">修改密码（登录态）。SDK 自动注入当前 loginId，前端只需传旧/新密码。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudUpdatePasswordBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>oldPassword</code></td><td>String</td><td><span class="req">是</span></td><td>旧密码</td></tr>
+            <tr><td><code>newPassword</code></td><td>String</td><td><span class="req">是</span></td><td>新密码（服务端校验强度）</td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认以会话为准</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功返回 code=200</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/refreshToken</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">刷新令牌 / 续期：重新签票桥接本地登录，刷新 token 时长。无请求参数。</p>
+          <p class="api-title">返回参数 <span class="rt">(CloudLoginVo)</span></p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td><code>data</code></td><td>CloudLoginVo</td><td>含刷新后的本地 accessToken / expireIn / clientId</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/addUser</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">新增用户（登录态）：当前用户在其所属租户下创建新用户，SDK 自动注入操作人 loginId。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudAddUserBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>userName</code></td><td>String</td><td><span class="req">是</span></td><td>用户账号（登录名）</td></tr>
+            <tr><td><code>password</code></td><td>String</td><td><span class="opt">否</span></td><td>密码；留空用服务端默认密码（sys.user.initPassword）</td></tr>
+            <tr><td><code>phonenumber</code></td><td>String</td><td><span class="opt">否</span></td><td>手机号（唯一）</td></tr>
+            <tr><td><code>nickName</code></td><td>String</td><td><span class="opt">否</span></td><td>昵称；留空默认取账号</td></tr>
+            <tr><td><code>deptId</code></td><td>Long</td><td><span class="opt">否</span></td><td>归属部门 ID</td></tr>
+            <tr><td><code>email</code></td><td>String</td><td><span class="opt">否</span></td><td>邮箱（唯一）</td></tr>
+            <tr><td><code>sex</code></td><td>String</td><td><span class="opt">否</span></td><td>性别（0男 1女 2未知）</td></tr>
+            <tr><td><code>status</code></td><td>String</td><td><span class="opt">否</span></td><td>账号状态（0正常 1停用），默认正常</td></tr>
+            <tr><td><code>remark</code></td><td>String</td><td><span class="opt">否</span></td><td>备注</td></tr>
+            <tr><td><code>roleKeys</code></td><td>List&lt;String&gt;</td><td><span class="opt">否</span></td><td>角色编码列表；账号已存在时仅追加绑定缺失角色</td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>一般无需传，服务端以操作人会话为准</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td><code>data</code></td><td>Long</td><td>用户 userId（新建或已存在补绑角色）；服务端未回传时为 null</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/updateUser</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">修改当前登录人信息（仅本人，按需更新：未传字段保持原值）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudUpdateUserBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>nickName</code></td><td>String</td><td><span class="opt">否</span></td><td>用户昵称</td></tr>
+            <tr><td><code>phonenumber</code></td><td>String</td><td><span class="opt">否</span></td><td>手机号（唯一）</td></tr>
+            <tr><td><code>email</code></td><td>String</td><td><span class="opt">否</span></td><td>邮箱（唯一）</td></tr>
+            <tr><td><code>sex</code></td><td>String</td><td><span class="opt">否</span></td><td>性别（0男 1女 2未知）</td></tr>
+            <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>一般无需传，服务端以会话为准</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr><tr><td><code>data</code></td><td>null</td><td>成功返回 code=200</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getRoles</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">获取指定用户的角色列表（userId 或 username 二选一）。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>userId</code></td><td>Long</td><td><span class="opt">二选一</span></td><td>用户 ID（优先）</td></tr>
+            <tr><td><code>username</code></td><td>String</td><td><span class="opt">二选一</span></td><td>用户登录账号</td></tr>
+          </table>
+          <p class="api-title">返回参数 <span class="rt">(List&lt;CloudRoleDTO&gt;)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>roleId</code></td><td>Long</td><td>角色 ID</td></tr>
+            <tr><td><code>roleName</code></td><td>String</td><td>角色名称</td></tr>
+            <tr><td><code>roleKey</code></td><td>String</td><td>角色权限标识</td></tr>
+            <tr><td><code>dataScope</code></td><td>String</td><td>数据范围（1全部 2自定 3本部门 4本部门及以下 5仅本人 6部门及以下或本人）</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getRoleByKey</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">根据角色权限标识查询单个角色。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>roleKey</code></td><td>String</td><td><span class="req">是</span></td><td>角色标识（如 admin 或 {clientId}-admin）</td></tr>
+          </table>
+          <p class="api-title">返回参数 <span class="rt">(CloudRoleDTO，字段同上；不存在时 data 为 null)</span></p>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/getRoleUsers</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">分页查询角色下绑定的用户列表（roleId 或 roleKey 二选一，roleId 优先）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudRoleUserQueryBo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>roleId</code></td><td>Long</td><td><span class="opt">二选一</span></td><td>角色 ID（优先）</td></tr>
+            <tr><td><code>roleKey</code></td><td>String</td><td><span class="opt">二选一</span></td><td>角色权限标识（支持短标识或完整 {clientId}-{标识}）</td></tr>
+            <tr><td><code>pageNum</code></td><td>Integer</td><td><span class="opt">否</span></td><td>当前页（从 1 开始，默认 1）</td></tr>
+            <tr><td><code>pageSize</code></td><td>Integer</td><td><span class="opt">否</span></td><td>每页大小（默认 10）</td></tr>
+          </table>
+          <p class="api-title">返回参数 <span class="rt">(CloudUserPageVo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>rows</code></td><td>List&lt;CloudUserVo&gt;</td><td>当前页用户列表（字段同 getLoginUserInfo 的 user）</td></tr>
+            <tr><td><code>total</code></td><td>Long</td><td>总记录数</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <h3>参数配置（sys_config）</h3>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getConfigAll</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">查询当前租户下全部参数配置。无请求参数。</p>
+          <p class="api-title">返回参数 <span class="rt">(List&lt;CloudConfigVo&gt;)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>configId</code></td><td>Long</td><td>参数主键</td></tr>
+            <tr><td><code>configName</code></td><td>String</td><td>参数名称</td></tr>
+            <tr><td><code>configKey</code></td><td>String</td><td>参数键名</td></tr>
+            <tr><td><code>configValue</code></td><td>String</td><td>参数键值</td></tr>
+            <tr><td><code>configType</code></td><td>String</td><td>系统内置（Y是 N否）</td></tr>
+            <tr><td><code>remark</code></td><td>String</td><td>备注</td></tr>
+            <tr><td><code>createTime</code></td><td>Date</td><td>创建时间</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getConfigById</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">根据参数 ID 查询参数配置。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+          <tr><td><code>configId</code></td><td>Long</td><td><span class="req">是</span></td><td>参数配置主键 ID</td></tr></table>
+          <p class="api-title">返回参数 <span class="rt">(CloudConfigVo，字段同上)</span></p>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getConfigByKey</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">根据参数键名查询参数配置。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+          <tr><td><code>configKey</code></td><td>String</td><td><span class="req">是</span></td><td>参数键名，如 sys.user.initPassword</td></tr></table>
+          <p class="api-title">返回参数 <span class="rt">(CloudConfigVo，字段同上)</span></p>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getConfigValueByKey</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">根据参数键名直接返回参数键值（单值场景）。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+          <tr><td><code>configKey</code></td><td>String</td><td><span class="req">是</span></td><td>参数键名，如 sys.account.registerUser</td></tr></table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td><code>data</code></td><td>String</td><td>参数键值字符串</td></tr></table>
+        </div>
+      </div>
+
+      <h3>区域（sys_area）/ 通知公告（sys_notice）</h3>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/listAreas</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">查询行政地区编码列表（所有查询字段可空，为空时不过滤）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudAreaBo，可传 {})</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>id</code></td><td>Long</td><td><span class="opt">否</span></td><td>主键</td></tr>
+            <tr><td><code>areaCode</code></td><td>String</td><td><span class="opt">否</span></td><td>地区编码（精确匹配）</td></tr>
+            <tr><td><code>areaName</code></td><td>String</td><td><span class="opt">否</span></td><td>区域名称（模糊匹配）</td></tr>
+            <tr><td><code>areaLevel</code></td><td>Integer</td><td><span class="opt">否</span></td><td>区域级别（0国家 1省 2市 3区 4街道）</td></tr>
+            <tr><td><code>parentCode</code></td><td>String</td><td><span class="opt">否</span></td><td>父级编码（精确匹配）</td></tr>
+            <tr><td><code>compartment</code></td><td>String</td><td><span class="opt">否</span></td><td>区划代码</td></tr>
+          </table>
+          <p class="api-title">返回参数 <span class="rt">(List&lt;CloudAreaVo&gt;)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>id</code></td><td>Long</td><td>主键</td></tr>
+            <tr><td><code>areaCode</code></td><td>String</td><td>地区编码</td></tr>
+            <tr><td><code>areaName</code></td><td>String</td><td>区域名称</td></tr>
+            <tr><td><code>areaLevel</code></td><td>Integer</td><td>区域级别</td></tr>
+            <tr><td><code>parentCode</code></td><td>String</td><td>父级编码</td></tr>
+            <tr><td><code>compartment</code></td><td>String</td><td>区划代码</td></tr>
+            <tr><td><code>syncFlag</code></td><td>Byte</td><td>更新标记</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getAreaByCode</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">根据区域编码查询单个区域详情。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+          <tr><td><code>areaCode</code></td><td>String</td><td><span class="req">是</span></td><td>区域编码，如 110000</td></tr></table>
+          <p class="api-title">返回参数 <span class="rt">(CloudAreaVo，字段同上)</span></p>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/listNotices</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">分页查询通知公告列表（所有查询字段可空）。</p>
+          <p class="api-title">请求参数 <span class="rt">(CloudNoticeBo，可传 {})</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>noticeId</code></td><td>Long</td><td><span class="opt">否</span></td><td>公告 ID</td></tr>
+            <tr><td><code>noticeTitle</code></td><td>String</td><td><span class="opt">否</span></td><td>公告标题（模糊匹配）</td></tr>
+            <tr><td><code>noticeType</code></td><td>String</td><td><span class="opt">否</span></td><td>公告类型（1通知 2公告）</td></tr>
+            <tr><td><code>status</code></td><td>String</td><td><span class="opt">否</span></td><td>公告状态（0正常 1关闭）</td></tr>
+            <tr><td><code>createByName</code></td><td>String</td><td><span class="opt">否</span></td><td>创建人名称（模糊匹配）</td></tr>
+            <tr><td><code>pageNum</code></td><td>Integer</td><td><span class="opt">否</span></td><td>当前页（默认 1）</td></tr>
+            <tr><td><code>pageSize</code></td><td>Integer</td><td><span class="opt">否</span></td><td>每页大小（默认 10）</td></tr>
+          </table>
+          <p class="api-title">返回参数 <span class="rt">(CloudNoticePageVo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>rows</code></td><td>List&lt;CloudNoticeVo&gt;</td><td>当前页公告列表（字段见下）</td></tr>
+            <tr><td><code>total</code></td><td>Long</td><td>总记录数</td></tr>
+          </table>
+          <p class="api-title">CloudNoticeVo 字段</p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>noticeId</code></td><td>Long</td><td>公告 ID</td></tr>
+            <tr><td><code>noticeTitle</code></td><td>String</td><td>公告标题</td></tr>
+            <tr><td><code>noticeType</code></td><td>String</td><td>公告类型（1通知 2公告）</td></tr>
+            <tr><td><code>noticeContent</code></td><td>String</td><td>公告内容</td></tr>
+            <tr><td><code>status</code></td><td>String</td><td>公告状态（0正常 1关闭）</td></tr>
+            <tr><td><code>remark</code></td><td>String</td><td>备注</td></tr>
+            <tr><td><code>createBy</code></td><td>Long</td><td>创建者 ID</td></tr>
+            <tr><td><code>createByName</code></td><td>String</td><td>创建人名称</td></tr>
+            <tr><td><code>createTime</code></td><td>Date</td><td>创建时间</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/getNoticeById</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">根据公告 ID 查询公告详情。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+          <tr><td><code>noticeId</code></td><td>Long</td><td><span class="req">是</span></td><td>公告 ID</td></tr></table>
+          <p class="api-title">返回参数 <span class="rt">(CloudNoticeVo，字段同上)</span></p>
+        </div>
+      </div>
+
+      <h3>通用透传代理</h3>
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/proxy/{type}</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">将任意已登录业务接口一次接入，无需 SDK 新增方法。SDK 自动注入 client/sign/X-Browser-Id 并校验登录态。</p>
+          <p class="api-title">请求参数</p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>type</code></td><td>String</td><td><span class="req">是</span></td><td>路径变量，认证中心已注册的 SaSsoMessage type</td></tr>
+            <tr><td><code>body</code></td><td>Object</td><td><span class="opt">否</span></td><td>业务参数 JSON（为空按空对象处理）</td></tr>
+          </table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td><code>data</code></td><td>Object</td><td>认证中心原始响应 data</td></tr></table>
+          <div class="note warn">本端点只保证登录，不代替业务级鉴权（服务端 handler 内部需自行鉴权），避免「拿到 token 就能调任何 type」。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ /authCenter/oss ============ -->
+    <section id="ctl-oss">
+      <h2><span class="num">7</span>/authCenter/oss 文件接口</h2>
+      <p class="sub">Controller：<code>CloudOssController</code>。类级<b>未</b>标注 <code>@SaIgnore</code>，<b class="login-y">需登录</b>。</p>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-post">POST</span><span class="path">/authCenter/oss/upload</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">上传文件（form-data 单文件）。</p>
+          <p class="api-title">请求参数 <span class="rt">(multipart/form-data)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+            <tr><td><code>file</code></td><td>File</td><td><span class="req">是</span></td><td>表单文件，字段名必须为 file</td></tr>
+          </table>
+          <p class="api-title">返回参数 <span class="rt">(CloudOssUploadVo)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>url</code></td><td>String</td><td>文件访问地址</td></tr>
+            <tr><td><code>fileName</code></td><td>String</td><td>文件名</td></tr>
+            <tr><td><code>ossId</code></td><td>String</td><td>对象存储主键，需保存用于关联业务数据</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/oss/getUrlById</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">根据 ossId 获取单个文件 URL。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+          <tr><td><code>ossId</code></td><td>Long</td><td><span class="req">是</span></td><td>文件主键</td></tr></table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td><code>data</code></td><td>String</td><td>文件 URL</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/oss/getUrlByIds</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">根据 ossId 串（逗号分隔）获取多个文件 URL。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+          <tr><td><code>ossIds</code></td><td>String</td><td><span class="req">是</span></td><td>逗号分隔的 ossId 串，如 "1,2,3"</td></tr></table>
+          <p class="api-title">返回参数</p>
+          <table><tr><th>字段</th><th>类型</th><th>说明</th></tr>
+          <tr><td><code>data</code></td><td>String</td><td>按入参顺序逗号分隔的 URL 串，未找到该位为空串</td></tr></table>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="head"><span class="tag t-get">GET</span><span class="path">/authCenter/oss/listByIds</span><span class="login-y">需登录</span></div>
+        <div class="body">
+          <p class="desc">根据 ossId 串查询文件完整信息列表（按入参顺序）。</p>
+          <p class="api-title">请求参数 <span class="rt">(query)</span></p>
+          <table><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr>
+          <tr><td><code>ossIds</code></td><td>String</td><td><span class="req">是</span></td><td>逗号分隔的 ossId 串</td></tr></table>
+          <p class="api-title">返回参数 <span class="rt">(List&lt;CloudOssVo&gt;)</span></p>
+          <table>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><td><code>ossId</code></td><td>Long</td><td>对象存储主键</td></tr>
+            <tr><td><code>fileName</code></td><td>String</td><td>文件名</td></tr>
+            <tr><td><code>originalName</code></td><td>String</td><td>原名</td></tr>
+            <tr><td><code>fileSuffix</code></td><td>String</td><td>文件后缀名</td></tr>
+            <tr><td><code>url</code></td><td>String</td><td>URL 地址</td></tr>
+            <tr><td><code>ext1</code></td><td>String</td><td>扩展字段</td></tr>
+            <tr><td><code>createTime</code></td><td>Date</td><td>创建时间</td></tr>
+            <tr><td><code>createBy</code></td><td>Long</td><td>上传人 ID</td></tr>
+            <tr><td><code>createByName</code></td><td>String</td><td>上传人名称</td></tr>
+            <tr><td><code>service</code></td><td>String</td><td>服务商</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CloudPlatformHelper ============ -->
+    <section id="helper">
+      <h2><span class="num">8</span>CloudPlatformHelper 调用工具方法</h2>
+      <p class="sub">所有方法均为 <code>public static</code>，业务代码直接 <code>CloudPlatformHelper.xxx()</code> 调用。以下为常用方法签名与说明。</p>
+
+      <h3>基础功能</h3>
+      <table>
+        <tr><th>方法</th><th>返回</th><th>说明</th></tr>
+        <tr><td><code>getRouters()</code></td><td>List&lt;CloudRouterVo&gt;</td><td>前端路由信息（自动推断 loginId）</td></tr>
+        <tr><td><code>getUserInfo()</code></td><td>CloudUserInfoVo</td><td>用户信息（含 user/permissions/roles）</td></tr>
+        <tr><td><code>getLoginUser()</code></td><td>CloudLoginUser</td><td>登录用户完整信息（部门/客户端/租户等）</td></tr>
+        <tr><td><code>doLoginByTicket(ticket)</code></td><td>CloudLoginVo</td><td>授权码登录（消费 ticket，自动 StpUtil.login）</td></tr>
+        <tr><td><code>isLogin()</code></td><td>boolean</td><td>仅本地 token 校验，不发起远程调用</td></tr>
+        <tr><td><code>isRemoteLogin()</code></td><td>boolean</td><td>远程校验登录态（关键操作二次确认用）</td></tr>
+        <tr><td><code>getUserInfoByTicket(ticket)</code></td><td>CloudUserInfoVo</td><td>会消费 ticket 并自动登录</td></tr>
+        <tr><td><code>getUserInfoByTicketWithoutLogin(ticket)</code></td><td>CloudUserInfoVo</td><td>不消费 ticket、不自动登录</td></tr>
+        <tr><td><code>getSsoAuthUrl(clientLoginUrl)</code></td><td>String</td><td>获取 SSO 认证中心登录地址</td></tr>
+        <tr><td><code>getSsoAuthUrl(clientLoginUrl, back)</code></td><td>String</td><td>同上，登录成功后回跳 back</td></tr>
+        <tr><td><code>getDefaultLoginUrl()</code></td><td>String</td><td>按 clientId 从服务端拉取默认登录地址</td></tr>
+        <tr><td><code>refreshLoginUser()</code></td><td>CloudLoginUser</td><td>强制刷新本地权限缓存（无需重新登录）</td></tr>
+        <tr><td><code>checkPermissionChange()</code></td><td>boolean</td><td>忽略节流立即检查一次权限变更</td></tr>
+      </table>
+
+      <h3>当前用户便捷获取</h3>
+      <table>
+        <tr><th>方法</th><th>返回</th><th>方法</th><th>返回</th></tr>
+        <tr><td><code>getUserId()</code></td><td>Long</td><td><code>getUsername()</code></td><td>String</td></tr>
+        <tr><td><code>getTenantId()</code></td><td>String</td><td><code>getDeptId()</code></td><td>Long</td></tr>
+        <tr><td><code>getDeptName()</code></td><td>String</td><td><code>getDeptCategory()</code></td><td>String</td></tr>
+        <tr><td><code>getNickname()</code></td><td>String</td><td><code>getCurrentDeptCode()</code></td><td>String</td></tr>
+        <tr><td><code>isSuperAdmin()</code></td><td>boolean</td><td><code>isTenantAdmin()</code></td><td>boolean</td></tr>
+        <tr><td><code>isClientAdmin()</code></td><td>boolean</td><td><code>isClientAdmin(clientId)</code></td><td>boolean</td></tr>
+      </table>
+
+      <h3>机构信息</h3>
+      <table>
+        <tr><th>方法</th><th>返回</th><th>说明</th></tr>
+        <tr><td><code>getDeptNameByIds("1,2,3")</code></td><td>String</td><td>多 id 拼接部门名</td></tr>
+        <tr><td><code>getDeptNameById(1L)</code></td><td>String</td><td>单 id 部门名</td></tr>
+        <tr><td><code>getDeptCodeByIds("1,2,3")</code></td><td>String</td><td>多 id 拼接部门编码</td></tr>
+        <tr><td><code>getDeptCodeById(1L)</code></td><td>String</td><td>单 id 部门编码</td></tr>
+        <tr><td><code>getDeptChildListById(1L)</code></td><td>List&lt;CloudSysDeptVo&gt;</td><td>子部门列表</td></tr>
+      </table>
+
+      <h3>用户信息同步 / 查询</h3>
+      <table>
+        <tr><th>方法</th><th>返回</th><th>说明</th></tr>
+        <tr><td><code>getUserInfoById(1L)</code></td><td>CloudUserVo</td><td>按 id 查单个用户</td></tr>
+        <tr><td><code>getUserListByIds("1,2,3")</code></td><td>List&lt;CloudUserVo&gt;</td><td>按 id 列表查多个</td></tr>
+        <tr><td><code>syncUserInfo(CloudSyncUserVo)</code></td><td>SaResult</td><td>同步用户信息到授权中心（写入侧）</td></tr>
+        <tr><td><code>addUser(CloudAddUserBo)</code></td><td>Long</td><td>新增用户（返回 userId）</td></tr>
+        <tr><td><code>updateCurrentUser(CloudUpdateUserBo)</code></td><td>void</td><td>修改当前登录人资料</td></tr>
+        <tr><td><code>getRolesByUserId(Long)</code></td><td>List&lt;CloudRoleDTO&gt;</td><td>查用户角色</td></tr>
+        <tr><td><code>getRolesByUsername(String)</code></td><td>List&lt;CloudRoleDTO&gt;</td><td>查用户角色</td></tr>
+        <tr><td><code>getRoleByRoleKey(String)</code></td><td>CloudRoleDTO</td><td>按 roleKey 查角色</td></tr>
+        <tr><td><code>getRoleUserPage(CloudRoleUserQueryBo)</code></td><td>CloudUserPageVo</td><td>角色下用户分页</td></tr>
+      </table>
+
+      <h3>字典 / 参数配置</h3>
+      <table>
+        <tr><th>方法</th><th>返回</th></tr>
+        <tr><td><code>getDictTypeAll()</code> / <code>getDictTypeById(1L)</code> / <code>getDictTypeByType("sys_yes_no")</code></td><td>List / CloudDictTypeVo</td></tr>
+        <tr><td><code>getDictDataById(100L)</code> / <code>getDictDataByType("sys_user_sex")</code></td><td>CloudDictDataVo / List</td></tr>
+        <tr><td><code>getConfigAll()</code> / <code>getConfigById(1L)</code> / <code>getConfigByKey("k")</code> / <code>getConfigValueByKey("k")</code></td><td>List / CloudConfigVo / String</td></tr>
+      </table>
+
+      <h3>区域 / 公告 / 文件</h3>
+      <table>
+        <tr><th>方法</th><th>返回</th></tr>
+        <tr><td><code>getAreaList(CloudAreaBo)</code> / <code>getAreaByCode("110000")</code></td><td>List&lt;CloudAreaVo&gt; / CloudAreaVo</td></tr>
+        <tr><td><code>getNoticeList(CloudNoticeBo)</code> / <code>getNoticeById(Long)</code></td><td>CloudNoticePageVo / CloudNoticeVo</td></tr>
+        <tr><td><code>uploadOss(bytes,name,type)</code> / <code>getOssUrlById(Long)</code> / <code>getOssUrlByIds("1,2")</code> / <code>getOssByIds("1,2")</code></td><td>CloudOssUploadVo / String / String / List</td></tr>
+      </table>
+
+      <h3>免登登录 / 注册 / 验证码（走 pushS 总线）</h3>
+      <table>
+        <tr><th>方法</th><th>入参</th><th>返回</th></tr>
+        <tr><td><code>getCaptcha()</code></td><td>无</td><td>CloudCaptchaVo</td></tr>
+        <tr><td><code>sendSmsCode / sendSmsCodeByPhone / sendSmsCodeForRegister / sendSmsCodeByReset</code></td><td>对应 Bo</td><td>void</td></tr>
+        <tr><td><code>resetPassword / register / registerByCaptcha / registerBySms</code></td><td>对应 Bo</td><td>void</td></tr>
+        <tr><td><code>loginByPassword / loginByPasswordNoCaptcha / loginByPhone / loginByWechat</code></td><td>对应 Bo</td><td>CloudLoginVo</td></tr>
+        <tr><td><code>updatePassword / refreshToken</code></td><td>Bo / 无</td><td>void / CloudLoginVo</td></tr>
+      </table>
+
+      <h3>操作日志 / 会话扩展 / 缓存 / 监听</h3>
+      <table>
+        <tr><th>方法</th><th>说明</th></tr>
+        <tr><td><code>writeOperLog(CloudOperLogVo)</code></td><td>写入操作日志（异步批量推送，有界队列）</td></tr>
+        <tr><td><code>setSessionExt(key,val)</code> / <code>setSessionExt(Map)</code></td><td>写入登录态会话扩展数据</td></tr>
+        <tr><td><code>getSessionExt(key,Class)</code> / <code>getSessionExtList(key,Class)</code> / <code>getSessionExt(key)</code></td><td>读取（对象/列表/原始）</td></tr>
+        <tr><td><code>hasSessionExt(key)</code> / <code>delSessionExt(key)</code></td><td>存在性 / 删除</td></tr>
+        <tr><td><code>clearAllCache()</code></td><td>清空全部远程缓存，返回删除 key 数</td></tr>
+        <tr><td><code>registerAuthListener(CloudAuthListener)</code> / <code>onUserInfoChanged(Consumer)</code></td><td>登录/登出、用户变更监听</td></tr>
+      </table>
+    </section>
+
+    <section id="frontend">
+      <h2><span class="num">9</span>前端对接方式（ticket 防重复消费）</h2>
+      <p class="sub">面向接入统一认证平台的各子系统前端。统一认证平台的 ticket 为<b>一次性票据，同一张 ticket 只能消费一次</b>；中转页需保证每个 ticket 只提交一次。配套阅读：认证中心接入指南（中转页创建、路由白名单、退出登录）。</p>
+
+      <h3>背景与现象</h3>
+      <p>以 silent 静默授权为例链路：中转页拿登录地址 → 认证中心已登录自动回跳并<b>签发一次性 ticket</b>（<code>...?back=业务页&amp;ticket=64位</code>）→ 中转页调 <code>GET /sso/doLoginByTicket?ticket=xxx</code> → 认证中心校验后立即<b>删票</b>返回本地 token。</p>
+      <p>ticket 是明文 query 参数，会残留在地址栏与历史记录。<code>back</code> 为空、F5 刷新、浏览器后退、请求双发都会用同一张票再次请求，此时票据已失效返回「无效 ticket」。若前端把该错误统一按「登录超时 / 401」处理而 <code>removeToken()</code>，就会再次跳认证中心 → silent 又免登回来，表现为<b>登录态反复消失、闪屏、循环重新登录</b>。</p>
+
+      <h3>前端必须落实的 4 点</h3>
+      <table>
+        <tr><th>序号</th><th>动作</th><th>解决的问题</th></tr>
+        <tr><td>①</td><td><b>消费后立即清洗 URL</b>：<code>history.replaceState(null,'',location.pathname+location.hash)</code>，成功 / 失败两条路径、跳转前都要执行</td><td>刷新、后退时地址栏不再有 ticket</td></tr>
+        <tr><td>②</td><td>跳 <code>back</code> 用 <code>location.replace(back || '/')</code>，<b>back 为空兜底业务首页</b>；不要用 <code>location.href</code> / <code>router.push</code></td><td>避免停留在带票页面，且历史不留回跳页</td></tr>
+        <tr><td>③</td><td><b>已登录短路</b>：进入中转页先探测本地登录态，已登录直接跳 <code>back</code>，不再消费 ticket</td><td>刷新 / 后退 / 多标签进入时天然幂等</td></tr>
+        <tr><td>④</td><td><b>错误分类</b>：把「无效 ticket / 票已消费」与「登录超时」区分开；本地 token 仍有效时按已登录处理，不 <code>removeToken()</code>、不立即重新发起 silent 授权</td><td>直接消除「登录消失」</td></tr>
+      </table>
+      <div class="note">③ 的重要前提：本地登录态探测可用 <code>GET /authCenter/getLoginUserInfo</code>，未登录会返回 401，<b>该探测请求必须排除在全局 401 拦截器之外</b>，否则探测本身就会清掉有效 token。④ 配套：<code>request.ts</code> / <code>permission.ts</code> 中「401 → 清 token → 跳 /sso」要加限定，仅本地 token 确实失效才触发重新授权。</div>
+
+      <h3>参考实现（Vue3 中转页 onMounted）</h3>
+      <pre><code>const ticket = getParam('ticket');
+const back = getParam('back') || '/';
+const cleanUrl = () => history.replaceState(null, '', location.pathname + location.hash);
+
+// ③ 轻量探测：请求需跳过全局 401 拦截（skipAuthRedirect 等标记）
+const isLocalLoginValid = async () => {
+  try {
+    await request({ url: '/authCenter/getLoginUserInfo', skipAuthRedirect: true });
+    return !!getToken();
+  } catch { return false; }
+};
+
+// ④ 只把「票据已消费」类错误归为可忽略
+const isTicketInvalid = (e) =>
+  /无效\s*ticket|ticket.*(已消费|失效|无效)|30004/i.test(e?.msg || e?.message || '');
+
+onMounted(async () => {
+  if (!ticket) { goSsoAuthUrl(); return; }
+
+  // ③ 已登录短路：刷新 / 后退 / 多标签进入时不再消费票据
+  if (await isLocalLoginValid()) { cleanUrl(); location.replace(back); return; }
+
+  // 防重：同一张票在并发或重复挂载下只提交一次
+  const key = 'sso_ticket_' + ticket;
+  if (sessionStorage.getItem(key)) { cleanUrl(); location.replace(back); return; }
+  sessionStorage.setItem(key, '1');
+
+  try {
+    const res = await userStore.ticketLogin({ ticket });   // POST /sso/doLoginByTicket
+    localStorage.setItem('satoken', res.data.accessToken);
+  } catch (e) {
+    // 票已消费但本地 token 有效 → 按已登录继续，不清理登录态
+    if (!isTicketInvalid(e) || !(await isLocalLoginValid())) {
+      sessionStorage.removeItem(key); cleanUrl(); goSsoAuthUrl(); return;
+    }
+  }
+
+  // ①② 先清洗地址，再 replace 到业务页（back 为空时进首页）
+  cleanUrl(); location.replace(back);
+});</code></pre>
+      <p><code>goSsoAuthUrl()</code> 保持原有逻辑：<code>/sso/getSsoAuthUrl</code> 或 <code>/sso/getEncryptedSsoAuthUrlForSilent</code>，<code>clientLoginUrl</code> 传中转页地址，<code>back</code> 传用户原本要去的业务页。</p>
+
+      <h3>验收清单</h3>
+      <table>
+        <tr><th>场景</th><th>期望结果</th></tr>
+        <tr><td>首次 silent 授权回跳</td><td>登录成功，地址栏无 ticket，直接进业务页</td></tr>
+        <tr><td>登录成功后 F5 刷新</td><td>不再请求 /sso/doLoginByTicket，或由已登录短路直接跳回；登录态保持</td></tr>
+        <tr><td>浏览器后退到回跳地址</td><td>不带票 / 短路跳过，不出现「无效 ticket」与重新登录</td></tr>
+        <tr><td>back 为空或为 undefined</td><td>进入业务首页，不停留在带票页面</td></tr>
+        <tr><td>主动登出后再访问</td><td>清本地 token 与 sessionStorage 防重标记，重新走 SSO 能正常登录</td></tr>
+        <tr><td>多实例部署 / 服务重启</td><td>行为一致（与后端节点无关）</td></tr>
+      </table>
+    </section>
+
+    <section id="cache">
+      <h2><span class="num">10</span>缓存档位速查</h2>
+      <p class="sub">远程读取接口按 TTL 在 Redis 缓存，TTL 期间零远程调用。</p>
+      <table>
+        <tr><th>档位</th><th>配置键</th><th>内置默认</th><th>涵盖接口</th></tr>
+        <tr><td>权限相关</td><td><code>sa-token.cache.ttl-seconds</code></td><td>20 秒（最小 5）</td><td>getUserInfo / getRouters / isRemoteLogin（可被 refreshLoginUser / 登出主动失效）</td></tr>
+        <tr><td>参考数据</td><td><code>sa-token.cache.reference-ttl-seconds</code></td><td>300 秒</td><td>部门 / 字典 / 参数配置 / 区域 / 公告 / 文件类接口</td></tr>
+        <tr><td>用户信息</td><td><code>sa-token.cache.user-ttl-seconds</code></td><td>60 秒</td><td>getUserInfoById / getUserListByIds</td></tr>
+      </table>
+      <div class="note">单接口例外优先级最高：<code>sa-token.cache.{apiName}.ttl-seconds</code>（如 <code>getDictDataByType.ttl-seconds: 600</code>）。未集成 Redis 时自动降级为「不缓存、每次远程调用」。</div>
+    </section>
+
+    <section id="whitelist">
+      <h2><span class="num">11</span>白名单与 CORS</h2>
+      <h3>登录白名单</h3>
+      <p>SDK 硬默认白名单 <code>["/sso/*", "/favicon.ico"]</code> 永远生效（登录前即可访问）。<code>/sdk-help.html</code> <b>不在</b>默认白名单中，其是否对外暴露由客户端系统自行决定；需要访问时，用 <code>sa-token.permit-paths</code> 追加：</p>
+      <pre><code>sa-token:
+  permit-paths:
+    - /admin-api/system/sms/callback/**
+    - /admin-api/openapi/webhook/**
+    - /admin-api/public/health</code></pre>
+      <h3>CORS 配置</h3>
+      <pre><code>sa-token:
+  client:
+    cors:
+      allowed-origins: https://app.example.com   # 默认 *
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+      allowed-headers: Authorization,Content-Type,X-Requested-With
+      max-age: 3600</code></pre>
+      <div class="note warn">网关若带 <code>/admin-api</code> 前缀，需做 <code>RewritePath</code> 剥掉前缀（SDK 控制器映射不带业务前缀），否则白名单放行后仍 404。详见接入实践文档。</div>
+    </section>
+
+    <section id="faq">
+      <h2><span class="num">?</span>常见问题</h2>
+      <table>
+        <tr><th>现象</th><th>原因 / 解决</th></tr>
+        <tr><td>@SaCheckPermission 不生效</td><td>漏引 <code>sa-token-spring-aop</code>，运行时静默忽略。SDK 已声明，确认未被排除。</td></tr>
+        <tr><td>token 已被冻结</td><td>两端 dynamic-active-timeout 不一致。SDK 已自动注入 true，确认 jwt-secret-key 与认证中心一致。</td></tr>
+        <tr><td>同浏览器多 tab 不一起登出</td><td>token extra 失效（非 JWT）。SDK 已注册 StpLogicJwtForSimple 对齐，确认未被自定义 StpLogic 覆盖。</td></tr>
+        <tr><td>异步线程 StpUtil.getLoginId() 抛空指针</td><td>sa-token 上下文基于 ThreadLocal，@Async / Quartz 内需手动透传 loginId。</td></tr>
+        <tr><td>前端报 401 / 403</td><td>未登录 401（SaResult），无权限 403（SaResult）；code 一致按 0 判成功。</td></tr>
+        <tr><td>/sdk-help.html 打不开</td><td>它不在 SDK 默认白名单中；如需访问，请将其加入 <code>sa-token.permit-paths</code> 或放开静态资源映射，并检查网关是否放行。</td></tr>
+      </table>
+    </section>
+
+    <div class="footer">统一授权认证平台 SDK · 客户端接入帮助文档（本页随 SDK 打包，需客户端自行放开 /sdk-help.html 访问）</div>
+  </main>
+</div>
+
+<script>
+  // ===== 生成可折叠的「接口 / 工具方法」子菜单 =====
+  (function buildNav(){
+    var slug = function(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); };
+    var makeGroup = function(mountId, title){
+      var mount = document.getElementById(mountId);
+      if(!mount){ return null; }
+      var grp = document.createElement('div');
+      grp.className = 'nav-grp';
+      var hd = document.createElement('div');
+      hd.className = 'nav-hd';
+      hd.innerHTML = '<span>' + title + '</span><span class="caret">▸</span>';
+      var body = document.createElement('div');
+      body.className = 'nav-body';
+      hd.addEventListener('click', function(){ grp.classList.toggle('open'); });
+      grp.appendChild(hd); grp.appendChild(body); mount.appendChild(grp);
+      return body;
+    };
+    var addLink = function(body, href, text, tag){
+      var a = document.createElement('a');
+      a.href = '#' + href;
+      if(tag){ var m = document.createElement('span'); m.className = 'm'; m.textContent = tag; a.appendChild(m); }
+      a.appendChild(document.createTextNode(text));
+      body.appendChild(a);
+    };
+
+    // Controller：每个接口一个可定位菜单项，分组默认折叠
+    [['ctl-sso','nav-ctl-sso'],['ctl-auth','nav-ctl-auth'],['ctl-oss','nav-ctl-oss']].forEach(function(pair){
+      var sec = document.getElementById(pair[0]);
+      if(!sec){ return; }
+      var h2 = sec.querySelector('h2');
+      var title = h2 ? h2.textContent.replace(/^\s*\d+\s*/,'').trim() : pair[0];
+      var body = makeGroup(pair[1], title);
+      if(!body){ return; }
+      sec.querySelectorAll('.endpoint').forEach(function(ep, i){
+        var pathEl = ep.querySelector('.head .path');
+        if(!pathEl){ return; }
+        var path = pathEl.textContent.trim();
+        var tagEl = ep.querySelector('.head .tag');
+        var id = 'ep-' + (slug(path) || 'x');
+        if(document.getElementById(id)){ id = id + '-' + i; }
+        ep.id = id;
+        ep.style.scrollMarginTop = '14px';
+        addLink(body, id, path, tagEl ? tagEl.textContent.trim() : '');
+      });
+    });
+
+    // CloudPlatformHelper：每个方法分类一个可定位菜单项
+    var helper = document.getElementById('helper');
+    if(helper){
+      var hb = makeGroup('nav-helper', '调用工具方法总览');
+      if(hb){
+        helper.querySelectorAll('h3').forEach(function(h3, i){
+          var id = 'helper-cat-' + i;
+          h3.id = id;
+          h3.style.scrollMarginTop = '14px';
+          addLink(hb, id, h3.textContent.trim());
+        });
+      }
+    }
+  })();
+
+  // 侧边栏高亮
+  const links = [...document.querySelectorAll('#nav a')];
+  const sections = links.map(a => document.querySelector(a.getAttribute('href')));
+  const obs = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (e.isIntersecting) {
+        const id = '#' + e.target.id;
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === id));
+      }
+    });
+  }, {rootMargin:'-10% 0px -80% 0px'});
+  sections.forEach(s => s && obs.observe(s));
+
+  // 搜索过滤
+  function doSearch(){
+    const q = document.getElementById('q').value.trim().toLowerCase();
+    if(!q){ document.querySelectorAll('.endpoint,tr').forEach(e=>e.classList.remove('hidden')); clearHl(); return; }
+    document.querySelectorAll('section').forEach(s=>{
+      s.querySelectorAll('.endpoint').forEach(ep=>{
+        ep.classList.toggle('hidden', !ep.innerText.toLowerCase().includes(q));
+      });
+      s.querySelectorAll('tr').forEach(tr=>{
+        if(tr.parentElement.tagName==='THEAD') return;
+        tr.classList.toggle('hidden', !tr.innerText.toLowerCase().includes(q));
+      });
+      if(s.id!=='overview' && s.id!=='faq'){
+        const any = s.querySelector('.endpoint:not(.hidden)') || s.innerText.toLowerCase().includes(q);
+        s.classList.toggle('hidden', !any);
+      }
+    });
+  }
+  function clearHl(){ document.querySelectorAll('.hl').forEach(e=>{const t=e.innerText;e.replaceWith(document.createTextNode(t));}); }
+</script>
+</body>
+</html>

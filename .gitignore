@@ -1,0 +1,10 @@
+**/.env.*
+!**/.env.example
+**/node_modules/
+**/target/
+**/.flattened-pom.xml
+**/dist/
+**/logs/
+**/*.log
+.idea/
+.vscode/

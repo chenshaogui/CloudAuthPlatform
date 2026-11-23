@@ -1,0 +1,1 @@
+dubboRequestFilter=io.gitee.chenshaogui.cloudauth.common.dubbo.filter.DubboRequestFilter

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.gitee.chenshaogui.cloudauth.system.mapper.SysClientRoleMapper">
+
+   <select id="countRoleCountByClientIds" resultType="java.lang.Long">
+          select
+              count(1)
+          from
+              sys_role sr
+          where
+              sr.status = '0'
+              and sr.role_id in (
+                  select scr.role_id
+                  from sys_client_role scr
+                  where scr.client_id in (
+                      <foreach collection="clientIdList"  item="clientId"  open="("   separator=","  close=")">
+                          #{clientId}
+                      </foreach>
+                  )
+              )
+      </select>
+
+</mapper>

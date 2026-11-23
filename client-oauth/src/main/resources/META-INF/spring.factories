@@ -1,0 +1,14 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  io.gitee.chenshaogui.cloudauth.securitycloud.oauth.config.CloudPermissionSyncAutoConfigure,\
+  io.gitee.chenshaogui.cloudauth.securitycloud.oauth.config.CloudCacheAutoConfigure,\
+  io.gitee.chenshaogui.cloudauth.securitycloud.oauth.config.CloudTokenClientAutoConfigure
+
+# 环境默认值：注入 sa-token.dynamic-active-timeout=true（最低优先级，业务方可覆盖），
+# 保证登录时写入 token 的 [最后活跃时间] key，避免认证中心判定 "token 已被冻结"
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  io.gitee.chenshaogui.cloudauth.securitycloud.oauth.config.CloudSsoEnvironmentPostProcessor
+
+# 上下文早置入：在容器刷新前把 ApplicationContext 交给 SpringContextUtil 静态持有者，
+# 使业务方 Bean 的构造器 / @PostConstruct 内调用 SDK 静态方法时不会拿到 null
+org.springframework.context.ApplicationContextInitializer=\
+  io.gitee.chenshaogui.cloudauth.securitycloud.oauth.config.CloudSsoContextInitializer

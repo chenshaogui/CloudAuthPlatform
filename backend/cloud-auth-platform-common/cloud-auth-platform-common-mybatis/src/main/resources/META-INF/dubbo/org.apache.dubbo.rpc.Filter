@@ -1,0 +1,1 @@
+dubboDataPermissionFilter=io.gitee.chenshaogui.cloudauth.common.mybatis.filter.DubboDataPermissionFilter

@@ -1,0 +1,13 @@
+package io.gitee.chenshaogui.cloudauth.casm.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Data
+@ConfigurationProperties(prefix = "project")
+@Configuration
+public class ProjectProperties {
+    private SnowflakeProperties snowflakeProperties;
+}
+

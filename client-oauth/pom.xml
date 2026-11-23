@@ -1,0 +1,190 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>io.gitee.chenshaogui.cloudauth</groupId>
+	<artifactId>cloud-auth-client-oauth</artifactId>
+	<version>1.5.11</version>
+	
+	<!-- 定义 Sa-Token 版本号 -->
+	<properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<sa-token.version>1.44.0</sa-token.version>
+		<spring-boot.version>2.7.2</spring-boot.version>
+		<hutool.version>5.8.20</hutool.version>
+		<forest.version>1.6.4</forest.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- SpringBoot依赖 -->
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.38</version>
+            <scope>provided</scope>
+         </dependency>
+		
+		<!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc/ -->
+		<dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot-starter</artifactId>
+            <version>${sa-token.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+		<!-- jakarta.servlet-api（SpringBoot3.x）：仅为编译 jakarta 适配类
+		     （BrowserIdFilterJakarta / SaServletFilterJakarta / CloudTokenClientConfigureJakarta）。
+		     运行时由业务方 SpringBoot3 自带的 jakarta servlet 提供实现，
+		     不传递依赖（provided），与上面的 javax 版 starter 在编译期互不冲突：
+		     本包仅含 jakarta.servlet.* API，不含 sa-token 同名类。 -->
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>5.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+        
+		<!-- Sa-Token 插件：整合SSO -->
+		<dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-sso</artifactId>
+            <version>${sa-token.version}</version>
+        </dependency>
+
+		<!-- Sa-Token AOP 拦截器：处理 @SaCheckPermission / @SaCheckRole / @SaCheckLogin 等注解。
+		     sa-token-spring-boot-starter / sa-token-servlet / sa-token-core 均不传递引入此包，
+		     缺失时注解会在运行时被静默忽略，CloudAuthPermissionImpl.getPermissionList 永远不会被调用。
+		     本 SDK 必须显式提供此包，否则基于 @SaCheckPermission 的整套权限校验失效。 -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-spring-aop</artifactId>
+			<version>${sa-token.version}</version>
+		</dependency>
+        
+		<!-- Sa-Token 整合 RedisTemplate -->
+		<dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-template</artifactId>
+            <version>${sa-token.version}</version>
+        </dependency>
+        
+		<!-- 提供Redis连接池 -->
+		<dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+             <optional>true</optional>
+        </dependency>
+
+		<!-- Sa-Token 插件：整合 Forest 请求工具 -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-forest</artifactId>
+			<version>${sa-token.version}</version>
+		</dependency>
+
+		<!-- Sa-Token 插件：整合 JWT（与认证中心 cloud-auth-platform 的
+		     StpLogicJwtForSimple 对齐）。
+		     必要性：sa-token 只有 JWT 模式才支持 token extra 扩展参数
+		     （StpLogic 基类 isSupportExtra() 返回 false，JWT 三种模式均返回 true）。
+		     不引入时登录传入的 setExtra(BROWSER_ID_KEY, browserId) 会被静默丢弃，
+		     认证中心「按 browserId 精准注销同浏览器多 tab」遍历 token 时
+		     读不到本 SDK 签发 token 的 browserId，永远匹配不上、踢不掉。 -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-jwt</artifactId>
+			<version>${sa-token.version}</version>
+		</dependency>
+
+		<!-- 显式引入 hutool-http 以使用 cn.hutool.http.HttpStatus（与认证中心保持一致） -->
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-http</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+
+		<!-- sa-token-jwt 传递引入 hutool-jwt（其 parent 管理版本，未显式声明），
+		     此处显式锁定与 hutool-http 同一版本，避免 hutool 各模块版本漂移 -->
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-jwt</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+
+		<!-- 显式锁定 forest 版本，避免传递依赖导致版本漂移 -->
+		<dependency>
+			<groupId>com.dtflys.forest</groupId>
+			<artifactId>forest-core</artifactId>
+			<version>${forest.version}</version>
+		</dependency>
+
+		<!-- 共享远程调用结果缓存需要 StringRedisTemplate；
+		     sa-token-redis-template 已传递引入 spring-data-redis，此处仅声明为可选依赖以满足编译期引用 -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-redis</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+	</dependencies>
+	<dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.9.0.2155</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <skip>true</skip> <!-- 跳过当前模块打包 -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

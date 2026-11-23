@@ -1,0 +1,3 @@
+io.gitee.chenshaogui.cloudauth.securitycloud.oauth.config.CloudPermissionSyncAutoConfigure
+io.gitee.chenshaogui.cloudauth.securitycloud.oauth.config.CloudCacheAutoConfigure
+io.gitee.chenshaogui.cloudauth.securitycloud.oauth.config.CloudTokenClientAutoConfigure
