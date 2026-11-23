@@ -35,7 +35,7 @@
             >
             </el-input>
           </el-form-item>
-          <el-form-item prop="code" label="输入验证码" class="flex-content-between bottom-input">
+          <el-form-item v-if="captchaEnabled" prop="code" label="输入验证码" class="flex-content-between bottom-input">
             <el-input
               v-model="loginForm.code"
               size="large"
@@ -47,7 +47,7 @@
             >
             </el-input>
             <div class="login-code-btn">
-              <el-button type="primary" size="large" plain style="width: 100%" :disabled="isSend" @click="getPhoneCode">{{ codeMsg }}</el-button>
+              <img v-if="codeUrl" :src="codeUrl" class="login-code-img" title="看不清？点击刷新" @click="getCode" />
             </div>
           </el-form-item>
           <el-checkbox v-model="loginForm.rememberMe" style="margin: 0 0 25px 0">记住密码</el-checkbox>
@@ -123,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { getTenantList, getRedirectUrl, getCodeByPwdApi, changePwdApi, getCodeByResetPwdApi } from '@/api/login';
+import { getTenantList, getRedirectUrl, getCodeImg, changePwdApi, getCodeByResetPwdApi } from '@/api/login';
 import { authBinding } from '@/api/system/social/auth';
 import { useUserStore } from '@/store/modules/user';
 import { LoginData, TenantVO } from '@/api/types';
@@ -144,6 +144,8 @@ const { t } = useI18n();
 const codeMsg = ref('获取验证码');
 const isSend = ref(false);
 const formRef = ref<ElFormInstance>();
+const codeUrl = ref('');
+const captchaEnabled = ref(true);
 
 const loginForm = ref<LoginData>({
   tenantId: '000000',
@@ -280,7 +282,7 @@ const handleLogin = () => {
         localStorage.removeItem('rememberMe');
       }
       loginForm.value.clientId = import.meta.env.VITE_APP_CLIENT_ID;
-      loginForm.value.uuid = loginForm.value.username;
+      loginForm.value.uuid = loginForm.value.uuid || '';
       // 先解析出真正的目标 client，写到 localStorage 用于后续 401 兜底跳转
       const { target, targetClient } = resolveRedirectTarget();
       localStorage.setItem('client', targetClient || client.value || import.meta.env.VITE_APP_CLIENT_ID);
@@ -305,6 +307,9 @@ const handleLogin = () => {
         }
       } else {
         loading.value = false;
+        if (captchaEnabled.value) {
+          await getCode();
+        }
       }
     } else {
       console.log('error submit!', fields);
@@ -364,21 +369,13 @@ const doSocialLogin = (type: string) => {
   });
 };
 
-const getPhoneCode = async () => {
-  if (!loginForm.value.username) {
-    ElMessage.warning('请输入手机号');
-    return;
-  }
-  if (!loginForm.value.password) {
-    ElMessage.warning('请输入密码');
-    return;
-  }
-  const res = await getCodeByPwdApi({ username: loginForm.value.username, password: loginForm.value.password, tenantId: loginForm.value.tenantId });
-  if (res.code === 200) {
-    ElMessage.success('验证码发送成功！');
-    codeCountdown();
-  } else {
-    ElMessage.error(res.msg || '验证码发送失败');
+const getCode = async () => {
+  const res = await getCodeImg();
+  const { data } = res;
+  captchaEnabled.value = data.captchaEnabled === undefined ? true : data.captchaEnabled;
+  if (captchaEnabled.value) {
+    codeUrl.value = 'data:image/gif;base64,' + data.img;
+    loginForm.value.uuid = data.uuid || '';
   }
 };
 
@@ -484,6 +481,7 @@ const submitForm = () => {
 onMounted(async () => {
   initTenantList();
   getLoginData();
+  await getCode();
 
   // 注：已登录检测与"已登录授权"弹窗已统一由 SsoLoginPage 处理，
   // 本组件作为纯登录表单使用，不再触发 authDialog（避免双弹窗/闪烁）。
@@ -718,7 +716,11 @@ $primaryColor: #547bd6;
 
 .login-code-img {
   height: 40px;
-  padding-left: 12px;
+  width: 100%;
+  object-fit: contain;
+  cursor: pointer;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 4px;
 }
 </style>
 

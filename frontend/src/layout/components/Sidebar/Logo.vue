@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import logo from '@/assets/logo/logo.png';
+import logo from '@/assets/logo/logo.svg';
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
 const title = import.meta.env.VITE_APP_LOGO_TITLE;

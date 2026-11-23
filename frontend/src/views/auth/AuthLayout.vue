@@ -31,6 +31,7 @@
 
 <script setup lang="ts">
 import { computed, watchEffect } from 'vue';
+import defaultLogoUrl from '@/assets/logo/logo.svg';
 import type { ClientLayoutConfig } from '@/views/auth/types';
 
 interface Props {
@@ -78,7 +79,7 @@ const resolvedLogoUrl = computed<string>(() => {
     (cfg as any).register?.logoUrl ||
     (cfg as any).resetPwd?.logoUrl ||
     (cfg as any).theme?.logoUrl ||
-    ''
+    defaultLogoUrl
   );
 });
 

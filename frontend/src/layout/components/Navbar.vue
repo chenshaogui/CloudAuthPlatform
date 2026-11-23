@@ -107,7 +107,6 @@ import notice from './notice/index.vue';
 import router from '@/router';
 import { buildSsoLoginQuery } from '@/utils/ssoQuery';
 import { ElMessageBoxOptions } from 'element-plus/es/components/message-box/src/message-box.type';
-import logo from '@/assets/logo/logo.png';
 import variables from '@/assets/styles/variables.module.scss';
 import Logo from '@/layout/components/Sidebar/Logo.vue';
 
