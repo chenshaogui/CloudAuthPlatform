@@ -37,14 +37,6 @@ public class RegisterBody extends LoginBody {
     private String userType;
 
     /**
-     * 用户来源类型（写入 sys_user_ext.user_source_type）
-     * <p>用于客户端个性化注册时区分用户身份（如辽运通"法人/安全责任人"）。
-     * 鉴权中心前端按 sys_client.layout_config.register.roles 渲染单选项后传入；
-     * 未传则不写入 sys_user_ext.user_source_type。</p>
-     */
-    private String userSourceType;
-
-    /**
      * 手机号（短信验证码校验用）
      * <p>注册页验证码由 /resource/sms/code 按手机号发送（Redis key = CAPTCHA_CODE_KEY + 手机号）；
      * 注册校验验证码时优先按本字段取 key，未传时回退 uuid（图片验证码场景）。</p>

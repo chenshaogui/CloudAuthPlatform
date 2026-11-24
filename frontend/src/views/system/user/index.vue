@@ -253,125 +253,6 @@
           </el-col>
         </el-row>
 
-        <!-- ln_pro 独有扩展字段（sys_user_ext），默认折叠，存可不存 -->
-        <el-collapse v-model="extCollapseActive" class="mt-2">
-          <el-collapse-item title="扩展信息" name="ext">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="真实姓名">
-                  <el-input v-model="form.ext.realUserName" placeholder="请输入真实姓名" maxlength="50" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="身份证号">
-                  <el-input v-model="form.ext.identify" placeholder="请输入身份证号" maxlength="20" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="证件号">
-                  <el-input v-model="form.ext.identifyCard" placeholder="请输入证件号" maxlength="60" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="统一社会信用代码">
-                  <el-input v-model="form.ext.usci" placeholder="请输入 USCI" maxlength="100" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="企业名称">
-                  <el-input v-model="form.ext.enterpriseName" placeholder="请输入企业名称" maxlength="255" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="企业代码">
-                  <el-input v-model="form.ext.enterpriseCode" placeholder="请输入企业代码" maxlength="50" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="道路运输证代码">
-                  <el-input v-model="form.ext.transportLicenseCode" placeholder="请输入运输证代码" maxlength="50" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="企业身份">
-                  <el-input v-model="form.ext.enterpriseIdentity" placeholder="请输入企业身份" maxlength="255" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="从业资格证">
-                  <el-input v-model="form.ext.qc" placeholder="请输入从业资格证号" maxlength="255" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="所在市区">
-                  <el-input v-model="form.ext.cityDistrict" placeholder="请输入所在市区" maxlength="255" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="强制重置密码">
-                  <el-radio-group v-model="form.ext.pwdResetFlag">
-                    <el-radio value="Y">是</el-radio>
-                    <el-radio value="N">否</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="共享用户标识">
-                  <el-input v-model="form.ext.sharedUser" placeholder="请输入共享用户标识" maxlength="30" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="老系统用户类型">
-                  <el-input-number v-model="form.ext.userTypeLn" :min="0" controls-position="right" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="用户级别">
-                  <el-input-number v-model="form.ext.levelId" :min="0" controls-position="right" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="CA 证书 ID">
-                  <el-input v-model="form.ext.caId" placeholder="请输入 CA 证书 ID" maxlength="50" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="发送日报">
-                  <el-radio-group v-model="form.ext.needSendDailyPaper">
-                    <el-radio value="Y">是</el-radio>
-                    <el-radio value="N">否</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="固定电话">
-                  <el-input v-model="form.ext.tel" placeholder="请输入固定电话" maxlength="16" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="联系地址">
-                  <el-input v-model="form.ext.address" placeholder="请输入联系地址" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-collapse-item>
-        </el-collapse>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -495,9 +376,6 @@ const queryFormRef = ref<ElFormInstance>();
 const userFormRef = ref<ElFormInstance>();
 const uploadRef = ref<ElUploadInstance>();
 const formDialogRef = ref<ElDialogInstance>();
-/** 扩展信息折叠面板激活项（默认折叠） */
-const extCollapseActive = ref<string[]>([]);
-
 const dialog = reactive<DialogOption>({
   visible: false,
   title: ''
@@ -522,8 +400,6 @@ const initFormData: UserForm = {
   remark: '',
   postIds: [],
   roleIds: [],
-  // 扩展信息默认空对象；提交前由 cleanupEmptyExt 决定是否清空
-  ext: {}
 };
 
 const initData: PageData<UserForm, UserQuery> = {
@@ -789,26 +665,11 @@ const handleUpdate = async (row?: UserForm) => {
   dialog.visible = true;
   dialog.title = '修改用户';
   Object.assign(form.value, data.user);
-  // 后端无 ext 数据时为 null，v-model 需 object 才能绑定，置空对象
-  form.value.ext = data.user.ext ?? {};
   postOptions.value = data.posts;
   roleOptions.value = Array.from(new Map([...data.roles, ...data.user.roles].map((role) => [role.roleId, role])).values());
   form.value.postIds = data.postIds;
   form.value.roleIds = data.roleIds;
   form.value.password = '';
-};
-
-/**
- * 清理空的扩展对象。
- * 当所有扩展字段都为空时，从 form 中删除 ext 属性，
- * 让后端按"不动 sys_user_ext"语义处理，避免写入全空记录。
- */
-const cleanupEmptyExt = (ext: Record<string, any> | undefined): void => {
-  if (!ext) return;
-  const hasValue = Object.values(ext).some((v) => v !== '' && v !== null && v !== undefined);
-  if (!hasValue) {
-    delete (form.value as any).ext;
-  }
 };
 
 /** 提交按钮 */
@@ -823,8 +684,6 @@ const submitForm = () => {
           form.value.postIds = null;
         }
       }
-      // 扩展字段全空时清掉 ext，避免后端写入空记录
-      cleanupEmptyExt(form.value.ext);
       if (form.value.userId) {
         await api.updateUser(form.value);
       } else {

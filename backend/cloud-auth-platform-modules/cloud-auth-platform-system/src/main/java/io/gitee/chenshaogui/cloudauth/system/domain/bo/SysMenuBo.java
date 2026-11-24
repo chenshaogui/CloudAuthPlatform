@@ -13,7 +13,6 @@ import io.gitee.chenshaogui.cloudauth.common.json.validate.JsonPattern;
 import io.gitee.chenshaogui.cloudauth.common.json.validate.JsonType;
 import io.gitee.chenshaogui.cloudauth.common.mybatis.core.domain.BaseEntity;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysMenu;
-import io.gitee.chenshaogui.cloudauth.system.domain.SysMenuExt;
 
 /**
  * 菜单权限业务对象 sys_menu
@@ -117,11 +116,5 @@ public class SysMenuBo extends BaseEntity {
      * 备注
      */
     private String remark;
-
-    /**
-     * 菜单扩展信息（ln_pro 独有字段，与 sys_menu_ext 1:1）
-     * <p>主表 add/edit 一并提交，由 SysMenuServiceImpl 同步写 sys_menu_ext。</p>
-     */
-    private SysMenuExt ext;
 
 }

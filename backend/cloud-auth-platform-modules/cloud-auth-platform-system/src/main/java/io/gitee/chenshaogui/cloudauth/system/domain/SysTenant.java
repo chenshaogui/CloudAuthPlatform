@@ -100,16 +100,4 @@ public class SysTenant extends BaseEntity {
     @TableLogic
     private String delFlag;
 
-    // ==================== ln_pro 融合扩展字段 ====================
-
-    /**
-     * 子系统 ID（ln_pro: sys_sec_tenant.SYSTEMID）
-     */
-    private String systemId;
-
-    /**
-     * 子系统名称（ln_pro: sys_sec_tenant.SYSTEMNAME）
-     */
-    private String systemName;
-
 }

@@ -7,7 +7,6 @@ import lombok.Data;
 import io.gitee.chenshaogui.cloudauth.common.excel.annotation.ExcelDictFormat;
 import io.gitee.chenshaogui.cloudauth.common.excel.convert.ExcelDictConvert;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysDept;
-import io.gitee.chenshaogui.cloudauth.system.domain.SysDeptExt;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -112,11 +111,5 @@ public class SysDeptVo implements Serializable {
      * 子菜单
      */
     private List<SysDept> children = new ArrayList<>();
-
-    /**
-     * 部门扩展信息（来自 sys_dept_ext，ln_pro 独有字段）
-     * <p>无扩展数据时为 null，前端需判空。仅按主键回填，不参与列表批量赋值。</p>
-     */
-    private SysDeptExt ext;
 
 }

@@ -135,13 +135,6 @@ public class RemoteUserBo implements Serializable {
     private String belongName;
 
     /**
-     * 用户来源类型（写入 sys_user_ext.user_source_type）
-     * <p>客户端个性化注册时由鉴权中心前端传入，标识用户身份（如"法人" / "安全责任人"）。
-     * 注册链路：RegisterBody → RemoteUserBo → SysUserBo.ext.userSourceType → sys_user_ext。</p>
-     */
-    private String userSourceType;
-
-    /**
      * 注册后自动绑定的角色标识列表（sys_role.role_key，可多个）
      * <p>注册链路：RegisterBody → RemoteUserBo → SysUserBo →
      * SysUserServiceImpl#registerUser 按 role_key 查角色并绑定 sys_user_role。

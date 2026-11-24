@@ -3,7 +3,6 @@ package io.gitee.chenshaogui.cloudauth.system.domain.vo;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysMenu;
-import io.gitee.chenshaogui.cloudauth.system.domain.SysMenuExt;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -123,11 +122,5 @@ public class SysMenuVo implements Serializable {
      * 子菜单
      */
     private List<SysMenuVo> children = new ArrayList<>();
-
-    /**
-     * 菜单扩展信息（来自 sys_menu_ext，ln_pro 独有字段）
-     * <p>无扩展数据时为 null，前端需判空。仅按主键回填，不参与列表批量赋值。</p>
-     */
-    private SysMenuExt ext;
 
 }

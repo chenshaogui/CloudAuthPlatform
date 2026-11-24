@@ -25,39 +25,6 @@ export interface UserQuery extends PageQuery {
 }
 
 /**
- * 用户扩展信息（来自 sys_user_ext，ln_pro 独有字段）
- * <p>字段来自 02_ddl_扩展表.sql 的 sys_user_ext；保存为表单可选项，不提交时不更新。</p>
- */
-export interface UserExtVO {
-  userId?: string | number;
-  // 身份 / 真实姓名
-  identify?: string;
-  identifyCard?: string;
-  realUserName?: string;
-  // 企业 / 资质
-  usci?: string;
-  enterpriseCode?: string;
-  transportLicenseCode?: string;
-  enterpriseName?: string;
-  enterpriseIdentity?: string;
-  qc?: string;
-  cityDistrict?: string;
-  // 账号配置
-  pwdResetFlag?: string;
-  sharedUser?: string;
-  userTypeLn?: number;
-  levelId?: string | number;
-  needSendDailyPaper?: string;
-  caId?: string;
-  // 联系方式 / 桌面
-  tel?: string;
-  address?: string;
-  desktopConfig?: string;
-  background?: string;
-  userSourceType?: string;
-}
-
-/**
  * 用户返回对象
  */
 export interface UserVO extends BaseEntity {
@@ -82,8 +49,6 @@ export interface UserVO extends BaseEntity {
   postIds: any;
   roleId: any;
   admin: boolean;
-  /** 用户扩展信息（sys_user_ext，ln_pro 独有字段；按需回填） */
-  ext?: UserExtVO;
 }
 
 /**
@@ -103,8 +68,6 @@ export interface UserForm {
   remark?: string;
   postIds: string[];
   roleIds: string[];
-  /** 用户扩展信息（sys_user_ext；表单不展开时为 undefined，由后端按"不动"语义处理） */
-  ext?: UserExtVO;
 }
 
 export interface UserInfoVO {

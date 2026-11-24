@@ -53,7 +53,7 @@ public class ClientPublicConfigVo implements Serializable {
      * {
      *   "template": "default|liaoyuntong",
      *   "login":    { "backgroundImage": "...", "primaryColor": "#547bd6", ... },
-     *   "register": { "roles": [{"label":"法人","value":"legal"}], ... },
+     *   "register": { "title":"用户注册", ... },
      *   "resetPwd": { ... }
      * }
      * }</pre>

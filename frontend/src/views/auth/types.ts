@@ -63,8 +63,6 @@ export interface RegisterLayoutConfig {
   platformTitle?: string;
   /** 表单区标题（默认"用户注册"） */
   title?: string;
-  /** 角色单选列表（控制用户身份，如"法人/安全责任人"） */
-  roles?: Array<{ label: string; value: string; default?: boolean }>;
   /** 是否需要邀请码 */
   showInviteCode?: boolean;
   /** 提交按钮文案 */

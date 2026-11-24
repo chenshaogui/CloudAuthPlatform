@@ -21,7 +21,6 @@ import io.gitee.chenshaogui.cloudauth.common.redis.utils.CacheUtils;
 import io.gitee.chenshaogui.cloudauth.common.satoken.utils.LoginHelper;
 import io.gitee.chenshaogui.cloudauth.common.tenant.helper.TenantHelper;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysDept;
-import io.gitee.chenshaogui.cloudauth.system.domain.SysDeptExt;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysRole;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysUser;
 import io.gitee.chenshaogui.cloudauth.system.domain.bo.SysDeptBo;
@@ -30,7 +29,6 @@ import io.gitee.chenshaogui.cloudauth.system.mapper.SysDeptMapper;
 import io.gitee.chenshaogui.cloudauth.system.mapper.SysRoleMapper;
 import io.gitee.chenshaogui.cloudauth.system.mapper.SysUserMapper;
 import io.gitee.chenshaogui.cloudauth.system.event.PermissionChangeEvent;
-import io.gitee.chenshaogui.cloudauth.system.service.ISysDeptExtService;
 import io.gitee.chenshaogui.cloudauth.system.service.ISysDeptService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -57,7 +55,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
     private final SysDeptMapper baseMapper;
     private final SysRoleMapper roleMapper;
     private final SysUserMapper userMapper;
-    private final ISysDeptExtService deptExtService;
 
     /**
      * Spring 事件发布器（权限同步机制使用）
@@ -180,8 +177,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
         SysDeptVo parentDept = baseMapper.selectVoOne(new LambdaQueryWrapper<SysDept>()
             .select(SysDept::getDeptName).eq(SysDept::getDeptId, dept.getParentId()));
         dept.setParentName(ObjectUtils.notNullGetter(parentDept, SysDeptVo::getDeptName));
-        // 回填 ln_pro 独有扩展字段（按需调用，单条读不影响列表性能）
-        dept.setExt(deptExtService.queryByDeptId(deptId));
         return dept;
     }
 
@@ -351,12 +346,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
         SysDept dept = MapstructUtils.convert(bo, SysDept.class);
         dept.setAncestors(info.getAncestors() + StringUtils.SEPARATOR + dept.getParentId());
         int rows = baseMapper.insert(dept);
-        // 新增部门扩展（ln_pro 独有字段，可选）
-        SysDeptExt ext = bo.getExt();
-        if (ext != null) {
-            ext.setDeptId(dept.getDeptId());
-            deptExtService.saveOrUpdate(ext);
-        }
         if (rows > 0) {
             publishDeptChange(PermissionChangeEvent.ChangeType.INSERT);
         }
@@ -398,12 +387,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
             && !StringUtils.equals(SystemConstants.ROOT_DEPT_ANCESTORS, dept.getAncestors())) {
             // 如果该部门是启用状态，则启用该部门的所有上级部门
             updateParentDeptStatusNormal(dept);
-        }
-        // 新增/更新部门扩展（ln_pro 独有字段，可选）
-        SysDeptExt ext = bo.getExt();
-        if (ext != null) {
-            ext.setDeptId(bo.getDeptId());
-            deptExtService.saveOrUpdate(ext);
         }
         if (result > 0) {
             publishDeptChange(PermissionChangeEvent.ChangeType.UPDATE);
@@ -462,8 +445,6 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteDeptById(Long deptId) {
         int rows = baseMapper.deleteById(deptId);
-        // 同步删除部门扩展（sys_dept_ext 1:1 关联，无 FK 需手动删）
-        deptExtService.deleteByDeptId(deptId);
         if (rows > 0) {
             publishDeptChange(PermissionChangeEvent.ChangeType.DELETE);
         }

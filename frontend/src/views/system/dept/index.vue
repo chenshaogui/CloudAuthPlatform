@@ -140,104 +140,6 @@
           </el-col>
         </el-row>
 
-        <!-- ln_pro 独有扩展字段（sys_dept_ext），默认折叠 -->
-        <el-collapse v-model="extCollapseActive" class="mt-2">
-          <el-collapse-item title="扩展信息" name="ext">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="部门负责人">
-                  <el-input v-model="form.ext.deptManager" placeholder="请输入部门负责人姓名" maxlength="100" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="负责人电话">
-                  <el-input v-model="form.ext.deptManagerTel" placeholder="请输入负责人电话" maxlength="20" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="传真">
-                  <el-input v-model="form.ext.fax" placeholder="请输入传真" maxlength="100" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="邮编">
-                  <el-input v-model="form.ext.postcode" placeholder="请输入邮编" maxlength="100" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="值班电话">
-                  <el-input v-model="form.ext.onDutyTel" placeholder="请输入值班电话" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="网址">
-                  <el-input v-model="form.ext.url" placeholder="请输入网址 URL" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="24">
-                <el-form-item label="地址">
-                  <el-input v-model="form.ext.address" placeholder="请输入地址" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="简称">
-                  <el-input v-model="form.ext.shortName" placeholder="请输入简称" maxlength="200" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="打印名">
-                  <el-input v-model="form.ext.printName" placeholder="请输入打印名" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="24">
-                <el-form-item label="描述">
-                  <el-input v-model="form.ext.description" type="textarea" placeholder="请输入描述" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="部门类型">
-                  <el-input v-model="form.ext.deptType" placeholder="请输入部门类型" maxlength="32" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="区域描述">
-                  <el-input v-model="form.ext.area" placeholder="请输入区域描述" maxlength="255" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="已部署">
-                  <el-input-number v-model="form.ext.deployed" :min="0" controls-position="right" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="事发地">
-                  <el-input-number v-model="form.ext.happenArea" :min="0" controls-position="right" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="是否启用">
-                  <el-input-number v-model="form.ext.used" :min="0" controls-position="right" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-collapse-item>
-        </el-collapse>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -279,9 +181,6 @@ const dialog = reactive<DialogOption>({
 const deptTableRef = ref<ElTableInstance>();
 const queryFormRef = ref<ElFormInstance>();
 const deptFormRef = ref<ElFormInstance>();
-/** 扩展信息折叠面板激活项（默认折叠） */
-const extCollapseActive = ref<string[]>([]);
-
 const initFormData: DeptForm = {
   deptId: undefined,
   parentId: undefined,
@@ -293,8 +192,6 @@ const initFormData: DeptForm = {
   phone: undefined,
   email: undefined,
   status: '0',
-  // 扩展信息默认空对象；提交前由 cleanupEmptyExt 决定是否清空
-  ext: {}
 };
 const initData: PageData<DeptForm, DeptQuery> = {
   form: { ...initFormData },
@@ -393,8 +290,6 @@ const handleUpdate = async (row: DeptVO) => {
   getDeptAllUser(row.deptId);
   const res = await getDept(row.deptId);
   form.value = res.data;
-  // 后端无 ext 数据时为 null，v-model 需 object 才能绑定，置空对象
-  form.value.ext = res.data.ext ?? {};
   const response = await listDeptExcludeChild(row.deptId);
   const data = proxy?.handleTree<DeptOptionsType>(response.data, 'deptId');
   if (data) {
@@ -415,8 +310,6 @@ const handleUpdate = async (row: DeptVO) => {
 const submitForm = () => {
   deptFormRef.value?.validate(async (valid: boolean) => {
     if (valid) {
-      // 扩展字段全空时清掉 ext，避免后端写入空记录
-      cleanupEmptyExt(form.value.ext);
       form.value.deptId ? await updateDept(form.value) : await addDept(form.value);
       proxy?.$modal.msgSuccess('操作成功');
       dialog.visible = false;
@@ -425,18 +318,6 @@ const submitForm = () => {
   });
 };
 
-/**
- * 清理空的扩展对象。
- * 当所有扩展字段都为空时，从 form 中删除 ext 属性，
- * 让后端按"不动 sys_dept_ext"语义处理，避免写入全空记录。
- */
-const cleanupEmptyExt = (ext: Record<string, any> | undefined): void => {
-  if (!ext) return;
-  const hasValue = Object.values(ext).some((v) => v !== '' && v !== null && v !== undefined);
-  if (!hasValue) {
-    delete (form.value as any).ext;
-  }
-};
 /** 删除按钮操作 */
 const handleDelete = async (row: DeptVO) => {
   await proxy?.$modal.confirm('是否确认删除名称为"' + row.deptName + '"的数据项?');

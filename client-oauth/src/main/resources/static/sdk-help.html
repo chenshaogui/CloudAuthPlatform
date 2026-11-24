@@ -495,7 +495,6 @@
             <tr><td><code>code</code></td><td>String</td><td><span class="opt">否</span></td><td>图形码 / 短信码（依场景二选一承载）</td></tr>
             <tr><td><code>uuid</code></td><td>String</td><td><span class="opt">否</span></td><td>图形码唯一标识（短信码场景留空）</td></tr>
             <tr><td><code>userType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户类型</td></tr>
-            <tr><td><code>userSourceType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户来源类型（写 sys_user_ext.user_source_type）</td></tr>
             <tr><td><code>roleKeys</code></td><td>List&lt;String&gt;</td><td><span class="opt">否</span></td><td>注册后自动绑定角色标识；为空时取 <code>sa-token.register-role-keys</code></td></tr>
             <tr><td><code>grantType</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 <code>password</code></td></tr>
             <tr><td><code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>租户 ID，默认 000000</td></tr>
@@ -517,7 +516,6 @@
             <tr><td><code>code</code></td><td>String</td><td><span class="req">是</span></td><td>图形验证码（用户输入）</td></tr>
             <tr><td><code>uuid</code></td><td>String</td><td><span class="req">是</span></td><td>图形验证码唯一标识（来自 /sso/captcha）</td></tr>
             <tr><td><code>userType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户类型</td></tr>
-            <tr><td><code>userSourceType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户来源类型</td></tr>
             <tr><td><code>roleKeys</code></td><td>List&lt;String&gt;</td><td><span class="opt">否</span></td><td>注册后自动绑定角色标识</td></tr>
             <tr><td><code>grantType</code> / <code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 password / 000000</td></tr>
           </table>
@@ -538,7 +536,6 @@
             <tr><td><code>phonenumber</code></td><td>String</td><td><span class="req">是</span></td><td>手机号（待注册号码）</td></tr>
             <tr><td><code>code</code></td><td>String</td><td><span class="req">是</span></td><td>短信验证码（6 位，字段名是 code 非 smsCode）</td></tr>
             <tr><td><code>userType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户类型</td></tr>
-            <tr><td><code>userSourceType</code></td><td>String</td><td><span class="opt">否</span></td><td>用户来源类型</td></tr>
             <tr><td><code>roleKeys</code></td><td>List&lt;String&gt;</td><td><span class="opt">否</span></td><td>注册后自动绑定角色标识</td></tr>
             <tr><td><code>grantType</code> / <code>tenantId</code></td><td>String</td><td><span class="opt">否</span></td><td>默认 password / 000000</td></tr>
           </table>

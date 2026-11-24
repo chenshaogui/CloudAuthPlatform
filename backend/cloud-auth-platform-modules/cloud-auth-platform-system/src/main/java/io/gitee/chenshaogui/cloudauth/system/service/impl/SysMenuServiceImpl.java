@@ -26,13 +26,11 @@ import io.gitee.chenshaogui.cloudauth.common.core.constant.Constants;
 import io.gitee.chenshaogui.cloudauth.common.core.constant.SystemConstants;
 import io.gitee.chenshaogui.cloudauth.common.satoken.utils.LoginHelper;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysMenu;
-import io.gitee.chenshaogui.cloudauth.system.domain.SysMenuExt;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysRole;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysRoleMenu;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysTenantPackage;
 import io.gitee.chenshaogui.cloudauth.system.domain.bo.SysMenuBo;
 import io.gitee.chenshaogui.cloudauth.system.event.PermissionChangeEvent;
-import io.gitee.chenshaogui.cloudauth.system.service.ISysMenuExtService;
 import io.gitee.chenshaogui.cloudauth.system.service.ISysMenuService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -59,7 +57,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
     private final SysClientMapper clientMapper;
     private final SysClientRoleMapper sysClientRoleMapper;
     private final SysTenantPackageMapper tenantPackageMapper;
-    private final ISysMenuExtService menuExtService;
 
     /**
      * 客户端只读查询助手：抽离到 helper，避免 SysMenuServiceImpl ↔ SysClientServiceImpl 循环依赖
@@ -337,10 +334,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public SysMenuVo selectMenuById(Long menuId) {
         SysMenuVo menu = baseMapper.selectVoById(menuId);
-        if (menu != null) {
-            // 回填 ln_pro 独有扩展字段（按需调用，单条读不影响列表性能）
-            menu.setExt(menuExtService.queryByMenuId(menuId));
-        }
         return menu;
     }
 
@@ -508,12 +501,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
         bo.setAppId(resolveAppIdForInsert(bo));
         SysMenu menu = MapstructUtils.convert(bo, SysMenu.class);
         int rows = baseMapper.insert(menu);
-        // 新增菜单扩展（ln_pro 独有字段，可选）
-        SysMenuExt ext = bo.getExt();
-        if (ext != null) {
-            ext.setMenuId(menu.getMenuId());
-            menuExtService.saveOrUpdate(ext);
-        }
         if (rows > 0) {
             // 新增应用菜单后自动授权给该应用的客户端管理员角色（{clientId}-admin），
             // 免去管理员新增菜单后还要手工到"角色管理"再授权一次才能访问的麻烦
@@ -631,12 +618,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
         }
         SysMenu menu = MapstructUtils.convert(bo, SysMenu.class);
         int rows = baseMapper.updateById(menu);
-        // 新增/更新菜单扩展（ln_pro 独有字段，可选）
-        SysMenuExt ext = bo.getExt();
-        if (ext != null) {
-            ext.setMenuId(bo.getMenuId());
-            menuExtService.saveOrUpdate(ext);
-        }
         if (rows > 0) {
             // parentId 变化导致 app_id 变化时，级联更新所有后代的 app_id（用 SQL 函数 get_menu_child_ids 递归）
             if (original != null
@@ -659,8 +640,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteMenuById(Long menuId) {
         int rows = baseMapper.deleteById(menuId);
-        // 同步删除菜单扩展（sys_menu_ext 1:1 关联，无 FK 需手动删）
-        menuExtService.deleteByMenuId(menuId);
         // 同步解绑角色-菜单关联：应用菜单新增时会自动授权给应用管理员角色，
         // 删除时必须一并清理，否则残留脏关联（角色菜单树出现空节点、统计异常）
         roleMenuMapper.deleteByMenuIds(List.of(menuId));
@@ -681,10 +660,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteMenuById(List<Long> menuIds) {
         int rows = baseMapper.deleteByIds(menuIds);
-        // 同步批量删除菜单扩展（sys_menu_ext 1:1 关联，无 FK 需手动删）
-        for (Long menuId : menuIds) {
-            menuExtService.deleteByMenuId(menuId);
-        }
         // 同步解绑角色-菜单关联，避免残留脏关联
         roleMenuMapper.deleteByMenuIds(menuIds);
         // 广播条件按"菜单实际删除行数"判断：原实现用角色关联清理行数判断，

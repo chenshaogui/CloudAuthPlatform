@@ -47,9 +47,6 @@ public class CloudRegisterBo implements Serializable {
     /** 用户类型 */
     private String userType;
 
-    /** 用户来源类型（写入 sys_user_ext.user_source_type，客户端个性化注册区分身份用，可空） */
-    private String userSourceType;
-
     /** 图形验证码（认证中心开启验证码时必填） */
     private String code;
 

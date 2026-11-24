@@ -230,7 +230,6 @@ public class SysLoginService {
             remoteUserBo.setPassword(null);
         }
         remoteUserBo.setUserType(userType);
-        remoteUserBo.setUserSourceType(registerBody.getUserSourceType());
         // 手机号写入 sys_user.phonenumber（注册页验证码/找回密码均按手机号）
         remoteUserBo.setPhonenumber(registerBody.getPhonenumber());
         // 注册后自动绑定的角色标识透传（SDK 配置 sa-token.register-role-keys 上报，可空）

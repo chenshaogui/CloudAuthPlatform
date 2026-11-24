@@ -7,7 +7,6 @@ import io.gitee.chenshaogui.cloudauth.common.sensitive.core.SensitiveStrategy;
 import io.gitee.chenshaogui.cloudauth.common.translation.annotation.Translation;
 import io.gitee.chenshaogui.cloudauth.common.translation.constant.TransConstant;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysUser;
-import io.gitee.chenshaogui.cloudauth.system.domain.SysUserExt;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
@@ -154,11 +153,5 @@ public class SysUserVo implements Serializable {
      * 管辖归属地名称
      */
     private String belongName;
-
-    /**
-     * 用户扩展信息（来自 sys_user_ext，ln_pro 独有字段）
-     * <p>无扩展数据时为 null，前端需判空。仅按主键回填，不参与列表批量赋值。</p>
-     */
-    private SysUserExt ext;
 
 }

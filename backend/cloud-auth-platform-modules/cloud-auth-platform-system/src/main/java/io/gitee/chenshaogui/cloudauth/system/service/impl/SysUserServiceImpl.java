@@ -30,7 +30,6 @@ import io.gitee.chenshaogui.cloudauth.common.tenant.helper.TenantHelper;
 import io.gitee.chenshaogui.cloudauth.system.api.model.LoginUser;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysRole;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysUser;
-import io.gitee.chenshaogui.cloudauth.system.domain.SysUserExt;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysUserPost;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysUserRole;
 import io.gitee.chenshaogui.cloudauth.system.domain.bo.SysUserBo;
@@ -40,7 +39,6 @@ import io.gitee.chenshaogui.cloudauth.system.domain.vo.SysUserExportVo;
 import io.gitee.chenshaogui.cloudauth.system.domain.vo.SysUserVo;
 import io.gitee.chenshaogui.cloudauth.system.event.PermissionChangeEvent;
 import io.gitee.chenshaogui.cloudauth.system.mapper.*;
-import io.gitee.chenshaogui.cloudauth.system.service.ISysUserExtService;
 import io.gitee.chenshaogui.cloudauth.system.service.ISysUserService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -73,7 +71,6 @@ public class SysUserServiceImpl implements ISysUserService {
     private final SysUserPostMapper userPostMapper;
     private final SysUserClientConfigMapper userClientConfigMapper;
     private final ISysUserClientConfigService userClientConfigService;
-    private final ISysUserExtService userExtService;
 
     /**
      * Spring 事件发布器（P0 权限同步机制使用）
@@ -242,8 +239,6 @@ public class SysUserServiceImpl implements ISysUserService {
             return user;
         }
         user.setRoles(roleMapper.selectRolesByUserId(user.getUserId()));
-        // 回填 ln_pro 独有扩展字段（按需调用，单条读不影响列表性能）
-        user.setExt(userExtService.queryByUserId(userId));
         return user;
     }
 
@@ -379,12 +374,6 @@ public class SysUserServiceImpl implements ISysUserService {
         insertUserPost(user, false);
         // 新增用户与角色管理
         insertUserRole(user, false);
-        // 新增用户扩展（ln_pro 独有字段，可选）
-        SysUserExt ext = user.getExt();
-        if (ext != null) {
-            ext.setUserId(sysUser.getUserId());
-            userExtService.saveOrUpdate(ext);
-        }
         // 新用户尚未登录，无需权限同步通知
         return rows;
     }
@@ -410,13 +399,6 @@ public class SysUserServiceImpl implements ISysUserService {
             // userVo已存在userId，desensitizeFlag，和belongCode、belongName
             clientConfigBo.setClientId(user.getClientId());
             userClientConfigService.saveOrUpdateConfig(clientConfigBo);
-        }
-        // 写入 sys_user_ext.user_source_type（客户端个性化注册：法人/安全责任人等）
-        if (StringUtils.isNotBlank(user.getUserSourceType())) {
-            SysUserExt ext = new SysUserExt();
-            ext.setUserId(sysUser.getUserId());
-            ext.setUserSourceType(user.getUserSourceType());
-            userExtService.saveOrUpdate(ext);
         }
         // 注册后自动绑定角色（roleKeys 为空不做任何事；仅用户尚未绑定角色时才绑定）
         // 传入 clientId：支持配置短标识时自动补全为 {clientId}-{短标识} 匹配（与新建角色入库规则一致）
@@ -480,14 +462,6 @@ public class SysUserServiceImpl implements ISysUserService {
         int flag = baseMapper.updateById(sysUser);
         if (flag < 1) {
             throw new ServiceException("修改用户{}信息失败", user.getUserName());
-        }
-        // 新增/更新用户扩展（ln_pro 独有字段，可选）
-        //   注：ext 为 null 表示前端未展开扩展面板，按"不动 ext"语义执行；
-        //       若需清空，可显式传 ext:{} 由 saveOrUpdate 走 update 分支置空
-        SysUserExt ext = user.getExt();
-        if (ext != null) {
-            ext.setUserId(user.getUserId());
-            userExtService.saveOrUpdate(ext);
         }
         // P0 权限同步：用户信息/角色变更，通知该用户刷新
         publishUserChange(List.of(user.getUserId()), PermissionChangeEvent.ChangeType.UPDATE);
@@ -855,10 +829,6 @@ public class SysUserServiceImpl implements ISysUserService {
         userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().in(SysUserPost::getUserId, ids));
         // 删除用户与客户端的关系
         userClientConfigMapper.delete(new LambdaQueryWrapper<SysUserClientConfig>().in(SysUserClientConfig::getUserId, ids));
-        // 删除用户扩展（sys_user_ext 1:1 关联，无 FK 需手动删）
-        for (Long userId : ids) {
-            userExtService.deleteByUserId(userId);
-        }
         // 防止更新失败导致的数据删除
         int flag = baseMapper.deleteByIds(ids);
         if (flag < 1) {

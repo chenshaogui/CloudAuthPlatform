@@ -1,7 +1,6 @@
 package io.gitee.chenshaogui.cloudauth.auth.service.impl;
 
 import cn.hutool.crypto.digest.BCrypt;
-import cn.hutool.crypto.SecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import io.gitee.chenshaogui.cloudauth.common.core.exception.base.BaseException;
@@ -82,23 +81,8 @@ public class PasswordAuthStrategy implements IAuthStrategy {
         }
         LoginUser loginUser = TenantHelper.dynamic(tenantId, () -> {
             LoginUser user = remoteUserService.getUserInfo(username, tenantId);
-            // 密码验证：先 BCrypt，失败再 MD5（兼容 ln_pro 老系统的 MD5 密码）
-            boolean passwordValid = BCrypt.checkpw(password, user.getPassword());
-            if (!passwordValid) {
-                String pwd = user.getPassword();
-                // 32 位 hex 字符串视为 MD5 哈希（ln_pro 老密码格式）
-                if (pwd != null && pwd.length() == 32 && pwd.matches("[0-9a-fA-F]+")) {
-                    String md5Hash = SecureUtil.md5(password).toLowerCase();
-                    if (md5Hash.equalsIgnoreCase(pwd)) {
-                        passwordValid = true;
-                        log.info("[兼容模式] 用户 {} 使用 MD5 老密码登录成功", username);
-                        // 可选：异步升级密码为 BCrypt（避免每次登录算 MD5）
-                        // upgradePasswordAsync(user.getUserId(), BCrypt.hashpw(password));
-                    }
-                }
-            }
-            boolean finalPasswordValid = passwordValid;
-            loginService.checkLogin(LoginType.PASSWORD, tenantId, username, () -> !finalPasswordValid);
+            loginService.checkLogin(LoginType.PASSWORD, tenantId, username,
+                () -> !BCrypt.checkpw(password, user.getPassword()));
             if (remoteUserService.isSimplePassword(password, tenantId)) {
                 String simpleReason = remoteUserService.getSimpleReason(password, tenantId);
                 throw new BaseException("登录失败：" + simpleReason + "，建议修改密码后再登录");

@@ -1035,7 +1035,6 @@ const urls = urlStr.split(',') // ['url1', 'url2', '']
 | `code` | String | 否 | 图形验证码（开启时必填） |
 | `uuid` | String | 否 | 来自 `/sso/captcha` |
 | `userType` | String | 否 | 用户类型 |
-| `userSourceType` | String | 否 | 用户来源类型（客户端个性化注册用，可空） |
 
 > `clientId`、`grantType`、`tenantId` 由 SDK 自动兜底。
 
@@ -1048,7 +1047,6 @@ const urls = urlStr.split(',') // ['url1', 'url2', '']
 | `code` | String | 条件 | 图形验证码（认证中心开启时必填，用户根据图片输入） |
 | `uuid` | String | 条件 | 来自 `/sso/captcha`；服务端按 `CAPTCHA_CODE_KEY + uuid` 校验 |
 | `userType` | String | 否 | 用户类型 |
-| `userSourceType` | String | 否 | 用户来源类型（可空） |
 
 > 不含 `phonenumber`。`clientId`、`grantType`、`tenantId` 由 SDK 自动兜底。对应 `CloudPlatformHelper.registerByCaptcha(...)`，与 `CloudRegisterBo`、`CloudRegisterBySmsBo` 底层同为服务端 `register`。
 
@@ -1061,7 +1059,6 @@ const urls = urlStr.split(',') // ['url1', 'url2', '']
 | `phonenumber` | String | 是 | 手机号（服务端按 `CAPTCHA_CODE_KEY + phonenumber` 校验；成功后写入 sys_user.phonenumber） |
 | `code` | String | 条件 | 短信验证码（`/sso/sendSmsCodeForRegister` 下发；**字段名是 `code`，非 `smsCode`**） |
 | `userType` | String | 否 | 用户类型 |
-| `userSourceType` | String | 否 | 用户来源类型（可空） |
 
 > 不含 `uuid`（短信场景 `uuid` 为空属正常）。`clientId`、`grantType`、`tenantId` 由 SDK 自动兜底。对应 `CloudPlatformHelper.registerBySms(...)`。
 

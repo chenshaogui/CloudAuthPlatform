@@ -275,7 +275,6 @@ export const useAuthFlow = () => {
     confirmPassword?: string;
     code?: string;
     uuid?: string;
-    userSourceType?: string;
   }) => {
     loading.value = true;
     try {

@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.gitee.chenshaogui.cloudauth.common.mybatis.core.domain.BaseEntity;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysDept;
-import io.gitee.chenshaogui.cloudauth.system.domain.SysDeptExt;
 
 /**
  * 部门业务对象 sys_dept
@@ -84,11 +83,5 @@ public class SysDeptBo extends BaseEntity {
      * 归属部门id（部门树）
      */
     private Long belongDeptId;
-
-    /**
-     * 部门扩展信息（ln_pro 独有字段，与 sys_dept_ext 1:1）
-     * <p>主表 add/edit 一并提交，由 SysDeptServiceImpl 同步写 sys_dept_ext。</p>
-     */
-    private SysDeptExt ext;
 
 }

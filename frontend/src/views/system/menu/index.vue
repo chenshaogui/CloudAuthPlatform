@@ -282,70 +282,6 @@
           </el-col>
         </el-row>
 
-        <!-- ln_pro 独有扩展字段（sys_menu_ext），默认折叠 -->
-        <el-collapse v-model="extCollapseActive" class="mt-2">
-          <el-collapse-item title="扩展信息" name="ext">
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="是否路由菜单">
-                  <el-select v-model="form.ext.isRoute" placeholder="是否路由菜单" clearable>
-                    <el-option label="是" :value="1" />
-                    <el-option label="否" :value="0" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="是否缓存路由">
-                  <el-select v-model="form.ext.keepAlive" placeholder="是否缓存路由" clearable>
-                    <el-option label="是" :value="1" />
-                    <el-option label="否" :value="0" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="默认跳转地址">
-                  <el-input v-model="form.ext.redirectUrl" placeholder="请输入默认跳转地址" maxlength="255" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="打开方式">
-                  <el-select v-model="form.ext.internalExternal" placeholder="打开方式" clearable>
-                    <el-option label="内部" :value="0" />
-                    <el-option label="外部" :value="1" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="24">
-                <el-form-item label="类名">
-                  <el-input v-model="form.ext.className" placeholder="请输入类名（前端组件 class）" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item label="是否记录日志">
-                  <el-input-number v-model="form.ext.rememberLog" :min="0" controls-position="right" />
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="日志字符串">
-                  <el-input v-model="form.ext.logString" placeholder="请输入日志字符串" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="24">
-                <el-form-item label="桌面配置 XML">
-                  <el-input v-model="form.ext.config" type="textarea" placeholder="请输入桌面布局配置 XML（老系统）" />
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-collapse-item>
-        </el-collapse>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -464,8 +400,6 @@ const uploadDialog = reactive<DialogOption>({
 
 const queryFormRef = ref<ElFormInstance>();
 const menuFormRef = ref<ElFormInstance>();
-/** 扩展信息折叠面板激活项（默认折叠） */
-const extCollapseActive = ref<string[]>([]);
 const initFormData = {
   path: '',
   menuId: undefined,
@@ -479,9 +413,7 @@ const initFormData = {
   visible: '0',
   status: '0',
   clientId: '',
-  appId: undefined,
-  // 扩展信息默认空对象；提交前由 cleanupEmptyExt 决定是否清空
-  ext: {}
+  appId: undefined
 };
 const data = reactive<PageData<MenuForm, MenuQuery>>({
   form: { ...initFormData },
@@ -613,8 +545,6 @@ const handleUpdate = async (row: MenuVO) => {
   if (row.menuId) {
     const { data } = await getMenu(row.menuId);
     form.value = data;
-    // 后端无 ext 数据时为 null，v-model 需 object 才能绑定，置空对象
-    form.value.ext = data.ext ?? {};
   }
   if (form.value.icon.includes('http')) {
     iconType.value = 'UPLOAD';
@@ -626,8 +556,6 @@ const handleUpdate = async (row: MenuVO) => {
 const submitForm = () => {
   menuFormRef.value?.validate(async (valid: boolean) => {
     if (valid) {
-      // 扩展字段全空时清掉 ext，避免后端写入空记录
-      cleanupEmptyExt(form.value.ext);
       form.value.menuId ? await updateMenu(form.value) : await addMenu(form.value);
       proxy?.$modal.msgSuccess('操作成功');
       dialog.visible = false;
@@ -636,18 +564,6 @@ const submitForm = () => {
   });
 };
 
-/**
- * 清理空的扩展对象。
- * 当所有扩展字段都为空时，从 form 中删除 ext 属性，
- * 让后端按"不动 sys_menu_ext"语义处理，避免写入全空记录。
- */
-const cleanupEmptyExt = (ext: Record<string, any> | undefined): void => {
-  if (!ext) return;
-  const hasValue = Object.values(ext).some((v) => v !== '' && v !== null && v !== undefined);
-  if (!hasValue) {
-    delete (form.value as any).ext;
-  }
-};
 /** 删除按钮操作 */
 const handleDelete = async (row: MenuVO) => {
   await proxy?.$modal.confirm('是否确认删除名称为"' + row.menuName + '"的数据项?');

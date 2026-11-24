@@ -1,6 +1,5 @@
 package io.gitee.chenshaogui.cloudauth.system.domain.vo;
 
-import io.gitee.chenshaogui.cloudauth.system.domain.SysUserExt;
 import lombok.Data;
 
 import java.io.Serial;
@@ -42,11 +41,5 @@ public class SysUserInfoVo implements Serializable {
      * 岗位列表
      */
     private List<SysPostVo> posts;
-
-    /**
-     * 用户扩展信息（来自 sys_user_ext，ln_pro 独有字段）
-     * <p>无扩展数据时为 null，前端需判空。</p>
-     */
-    private SysUserExt ext;
 
 }

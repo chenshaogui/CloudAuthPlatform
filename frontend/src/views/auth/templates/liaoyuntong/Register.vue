@@ -13,13 +13,6 @@
         <h2 class="lyt-register-subtitle">{{ formTitle }}</h2>
 
         <el-form ref="formRef" :model="form" :rules="rules" size="large" @submit.prevent>
-          <!-- 角色单选（按 registerCfg.roles） -->
-          <el-form-item v-if="hasRoles" prop="userSourceType" label="">
-            <el-radio-group v-model="form.userSourceType">
-              <el-radio v-for="r in roles" :key="r.value" :value="r.value">{{ r.label }}</el-radio>
-            </el-radio-group>
-          </el-form-item>
-
           <el-form-item prop="username">
             <el-input v-model="form.username" placeholder="请输入用户名" autocomplete="off" />
           </el-form-item>
@@ -60,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, computed, onUnmounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useAuthFlow, validateForm } from '@/views/auth/composables/useAuthFlow';
 import { getCodeApi } from '@/api/login';
@@ -84,15 +77,6 @@ const title = computed<string>(() => regCfg.value.platformTitle || '欢迎注册
 const formTitle = computed<string>(() => regCfg.value.title || '用户注册');
 const leftImage = computed<string>(() => regCfg.value.logoUrl || '');
 const agreementUrl = computed<string>(() => regCfg.value.agreementUrl || '');
-/** 内置默认角色（register.roles 未配置时使用，可被布局配置覆盖） */
-const DEFAULT_ROLES: Array<{ label: string; value: string; default?: boolean }> = [
-  { label: '法人', value: '法人', default: true },
-  { label: '安全责任人', value: '安全责任人' }
-];
-const roles = computed<Array<{ label: string; value: string; default?: boolean }>>(() =>
-  regCfg.value.roles?.length ? regCfg.value.roles : DEFAULT_ROLES
-);
-const hasRoles = computed<boolean>(() => roles.value.length > 0);
 const submitText = computed<string>(() => regCfg.value.submitText || '');
 
 const pageStyle = computed<Record<string, string>>(() => {
@@ -116,8 +100,7 @@ const form = reactive({
   phone: '',
   code: '',
   // 兼容后端 RegisterBody.userType
-  userType: 'sys_user',
-  userSourceType: ''
+  userType: 'sys_user'
 });
 
 const rules = computed(() => ({
@@ -140,8 +123,7 @@ const rules = computed(() => ({
     { required: true, message: '请输入手机号', trigger: 'blur' },
     { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
   ],
-  code: [{ required: true, message: '请输入短信验证码', trigger: 'change' }],
-  userSourceType: hasRoles.value ? [{ required: true, message: '请选择用户类型', trigger: 'change' }] : []
+  code: [{ required: true, message: '请输入短信验证码', trigger: 'change' }]
 }));
 
 const formRef = ref();
@@ -153,7 +135,7 @@ const handleRegister = async () => {
   }
   const valid = await validateForm(formRef);
   if (!valid) return;
-  // 提交数据：未配置角色时不带 userSourceType，手机号写入后端 phonenumber
+  // 手机号写入后端 phonenumber
   const submitData: any = {
     tenantId: form.tenantId,
     username: form.username,
@@ -163,7 +145,6 @@ const handleRegister = async () => {
     userType: form.userType,
     phonenumber: form.phone
   };
-  if (form.userSourceType) submitData.userSourceType = form.userSourceType;
   await register(submitData);
 };
 
@@ -216,13 +197,6 @@ const startCodeCountdown = () => {
 const goLogin = () => {
   pushAuthRoute('/login');
 };
-
-onMounted(() => {
-  if (hasRoles.value) {
-    const def = roles.value.find((r) => r.default) || roles.value[0];
-    form.userSourceType = def.value;
-  }
-});
 
 onUnmounted(() => {
   // 清理短信倒计时定时器

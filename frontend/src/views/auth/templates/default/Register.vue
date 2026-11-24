@@ -12,13 +12,6 @@
         </el-select>
       </el-form-item>
 
-      <!-- 角色单选（按 registerCfg.roles 渲染） -->
-      <el-form-item v-if="hasRoles" prop="userSourceType">
-        <el-radio-group v-model="form.userSourceType">
-          <el-radio v-for="r in roles" :key="r.value" :value="r.value">{{ r.label }}</el-radio>
-        </el-radio-group>
-      </el-form-item>
-
       <el-form-item prop="username">
         <el-input v-model="form.username" placeholder="请输入用户名" autocomplete="off">
           <template #prefix><el-icon><User /></el-icon></template>
@@ -72,8 +65,6 @@ const authFlow = useAuthFlow();
 
 const config = computed<ClientLayoutConfig>(() => props.config || {});
 const regCfg = computed<any>(() => (config.value as any).register || {});
-const roles = computed<Array<{ label: string; value: string; default?: boolean }>>(() => regCfg.value.roles || []);
-const hasRoles = computed<boolean>(() => roles.value.length > 0);
 const showTenant = computed<boolean>(() => true);
 const submitText = computed<string>(() => regCfg.value.submitText || '');
 
@@ -98,9 +89,7 @@ const form = reactive({
   code: '',
   uuid: '',
   // 兼容后端 RegisterBody.userType（原 views/register.vue 用 'sys_user'）
-  userType: 'sys_user',
-  // 角色类型：当 config.register.roles 配置后由用户选择，未配置时不提交
-  userSourceType: ''
+  userType: 'sys_user'
 });
 
 const rules = computed(() => ({
@@ -120,8 +109,7 @@ const rules = computed(() => ({
       trigger: 'blur'
     }
   ],
-  code: [{ required: true, message: '请输入验证码', trigger: 'change' }],
-  userSourceType: hasRoles.value ? [{ required: true, message: '请选择用户类型', trigger: 'change' }] : []
+  code: [{ required: true, message: '请输入验证码', trigger: 'change' }]
 }));
 
 const formRef = ref();
@@ -130,10 +118,7 @@ const handleRegister = async () => {
   const valid = await validateForm(formRef);
   if (!valid) return;
   form.uuid = captchaUuid.value || '';
-  // 提交数据：未配置角色时不带 userSourceType，避免后端写入空串
-  const submitData: any = { ...form };
-  if (!submitData.userSourceType) delete submitData.userSourceType;
-  await register(submitData);
+  await register({ ...form });
 };
 
 const refreshCaptcha = async () => {
@@ -147,10 +132,6 @@ const goLogin = () => {
 onMounted(async () => {
   await loadTenantList();
   if (tenantList.value?.length) form.tenantId = tenantList.value[0].tenantId;
-  if (hasRoles.value) {
-    const def = roles.value.find((r) => r.default) || roles.value[0];
-    form.userSourceType = def.value;
-  }
   if (captchaEnabled.value) await loadCaptcha();
 });
 </script>

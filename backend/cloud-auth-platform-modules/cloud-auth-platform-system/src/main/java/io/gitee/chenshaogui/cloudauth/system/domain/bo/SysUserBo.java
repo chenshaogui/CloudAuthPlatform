@@ -11,7 +11,6 @@ import io.gitee.chenshaogui.cloudauth.common.core.constant.SystemConstants;
 import io.gitee.chenshaogui.cloudauth.common.core.xss.Xss;
 import io.gitee.chenshaogui.cloudauth.common.mybatis.core.domain.BaseEntity;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysUser;
-import io.gitee.chenshaogui.cloudauth.system.domain.SysUserExt;
 
 import java.util.List;
 
@@ -137,13 +136,6 @@ public class SysUserBo extends BaseEntity {
     private String clientId;
 
     /**
-     * 用户来源类型（用于客户端个性化注册时标识用户身份，如"法人" / "安全责任人"）
-     * <p>由 RemoteUserBo.userSourceType 透传过来，注册链路在 SysUserServiceImpl#registerUser
-     * 中按非空判断写入 sys_user_ext.user_source_type。</p>
-     */
-    private String userSourceType;
-
-    /**
      * 注册后自动绑定的角色标识列表（sys_role.role_key，可多个）
      * <p>由 RemoteUserBo.roleKeys 透传，注册链路 registerUser 中按非空判断自动绑定；
      * 与 {@link #roleIds}（管理员指定角色ID）互不影响、语义不同。</p>
@@ -157,11 +149,5 @@ public class SysUserBo extends BaseEntity {
     public boolean isSuperAdmin() {
         return SystemConstants.SUPER_ADMIN_ID.equals(this.userId);
     }
-
-    /**
-     * 用户扩展信息（ln_pro 独有字段，与 sys_user_ext 1:1）
-     * <p>主表 add/edit 一并提交，由 SysUserServiceImpl 同步写 sys_user_ext。</p>
-     */
-    private SysUserExt ext;
 
 }
