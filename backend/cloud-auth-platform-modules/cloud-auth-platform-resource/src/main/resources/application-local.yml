@@ -2,24 +2,20 @@
 spring:
   cloud:
     nacos:
-      server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      server-addr: 100.66.1.5:8848
       discovery:
-        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
-        namespace: ${NACOS_NAMESPACE:}
-        group: ${USERDOMAIN_ROAMINGPROFILE:LOCAL_GROUP}
+        server-addr: 100.66.1.5:8848
+        namespace:
+        group: LOCAL_GROUP
       config:
-        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
-        namespace: ${NACOS_NAMESPACE:}
+        server-addr: 100.66.1.5:8848
+        namespace:
         file-extension: yaml
-      username: ${NACOS_USERNAME:}
-      password: ${NACOS_PASSWORD:}
+      username: nacos
+      password: 8oDiEz6NcE
   config:
     import:
-      - classpath:common-local.yml
-      - classpath:application-common.yml
-      - classpath:datasource.yml
-      - classpath:${spring.application.name}-local.yml
-      - optional:nacos:common-${spring.profiles.active:local}.yml
-      - optional:nacos:application-common.yml
-      - optional:nacos:datasource.yml
-      - optional:nacos:${spring.application.name}-${spring.profiles.active:local}.yml
+      - nacos:common-local.yml
+      - nacos:application-common.yml
+      - nacos:datasource.yml
+      - nacos:${spring.application.name}-local.yml
