@@ -57,7 +57,7 @@
         <el-table-column prop="menuName" label="菜单名称" :show-overflow-tooltip="true" width="160"></el-table-column>
         <el-table-column prop="icon" label="图标" align="center" width="100">
           <template #default="scope">
-            <svg-icon :icon-class="scope.row.icon" />
+            <svg-icon :class="{ 'table-app-icon': scope.row.menuType === 'A' }" :icon-class="scope.row.icon" />
           </template>
         </el-table-column>
         <el-table-column prop="orderNum" label="排序" width="60"></el-table-column>
@@ -128,9 +128,9 @@
               </el-radio-group>
             </el-form-item>
             <template v-if="iconType === 'ICON'">
-              <el-form-item label="菜单图标" prop="icon">
-                <!-- 图标选择器 -->
-                <icon-select v-model="form.icon" />
+              <el-form-item :label="form.menuType === 'A' ? '应用图标' : '菜单图标'" prop="icon">
+                <!-- 应用图标显示更大，菜单/目录图标显示更小 -->
+                <icon-select v-model="form.icon" :icon-size="form.menuType === 'A' ? '30px' : '16px'" />
               </el-form-item>
             </template>
             <template v-else-if="iconType === 'UPLOAD'">
@@ -697,5 +697,8 @@ onMounted(() => {
 .tree-border {
   height: 300px;
   overflow: auto;
+}
+.table-app-icon {
+  font-size: 22px;
 }
 </style>

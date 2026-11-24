@@ -39,7 +39,7 @@
                         <img :src="item.icon" alt="" />
                       </template>
                       <template v-else>
-                        <svg-icon v-if="item.icon && item.icon !== '#'" :icon-class="item.icon" class="mr-8px"></svg-icon>
+                        <svg-icon v-if="item.icon && item.icon !== '#'" :icon-class="item.icon" class="shortcut-svg-icon"></svg-icon>
                         <img v-else src="@/assets/images/menu_icon/default.png" alt="" />
                       </template>
                     </div>
@@ -268,10 +268,17 @@ onMounted(async () => {
     line-height: 60px;
     margin: 0 auto 10px;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     img {
       width: 100%;
       height: 100%;
+    }
+
+    .shortcut-svg-icon {
+      font-size: 32px;
     }
   }
 }
