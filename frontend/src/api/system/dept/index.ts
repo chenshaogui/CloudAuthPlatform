@@ -63,3 +63,12 @@ export const delDept = (deptId: number | string) => {
     method: 'delete'
   });
 };
+
+// 级联删除部门（含子部门，可一次删除多个）
+export const cascadeDelDept = (deptIds: (number | string)[]) => {
+  return request({
+    url: '/system/dept/cascade',
+    method: 'post',
+    data: deptIds
+  });
+};

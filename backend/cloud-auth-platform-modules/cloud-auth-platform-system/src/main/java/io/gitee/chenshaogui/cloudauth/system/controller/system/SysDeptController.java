@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 部门信息
@@ -140,6 +141,47 @@ public class SysDeptController extends BaseController {
         }
         deptService.checkDeptDataScope(deptId);
         return toAjax(deptService.deleteDeptById(deptId));
+    }
+
+    /**
+     * 级联删除部门（含所有子部门，可一次删除多个）
+     *
+     * @param deptIds 选中的部门ID
+     */
+    @SaCheckPermission("system:dept:remove")
+    @Log(title = "部门管理", businessType = BusinessType.DELETE)
+    @PostMapping("/cascade")
+    public R<Void> cascadeRemove(@RequestBody List<Long> deptIds) {
+        List<Long> ids = deptService.selectDeptIdsWithChildren(deptIds);
+        if (ids.isEmpty()) {
+            return R.warn("请选择要删除的部门");
+        }
+        List<SysDeptVo> depts = deptService.selectDeptByIds(ids);
+        if (depts == null) {
+            depts = List.of();
+        }
+        List<String> rootNames = depts.stream()
+            .filter(dept -> StringUtils.equals(SystemConstants.ROOT_DEPT_ANCESTORS, dept.getAncestors()))
+            .map(SysDeptVo::getDeptName)
+            .collect(Collectors.toList());
+        if (!rootNames.isEmpty()) {
+            return R.warn("根部门不允许删除：" + String.join("、", rootNames));
+        }
+        for (Long deptId : ids) {
+            String deptName = depts.stream()
+                .filter(dept -> deptId.equals(dept.getDeptId()))
+                .map(SysDeptVo::getDeptName)
+                .findFirst()
+                .orElse(String.valueOf(deptId));
+            if (deptService.checkDeptExistUser(deptId)) {
+                return R.warn("部门[" + deptName + "]存在用户,不允许删除");
+            }
+            if (postService.countPostByDeptId(deptId) > 0) {
+                return R.warn("部门[" + deptName + "]存在岗位,不允许删除");
+            }
+            deptService.checkDeptDataScope(deptId);
+        }
+        return toAjax(deptService.deleteDeptsByIds(ids));
     }
 
     /**

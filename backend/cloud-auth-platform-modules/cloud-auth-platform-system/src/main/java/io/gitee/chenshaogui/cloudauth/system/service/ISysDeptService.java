@@ -167,4 +167,20 @@ public interface ISysDeptService {
      */
     int deleteDeptById(Long deptId);
 
+    /**
+     * 查询部门及其所有子部门的ID集合
+     *
+     * @param deptIds 选中的部门ID
+     * @return 选中部门及所有子孙部门的ID
+     */
+    List<Long> selectDeptIdsWithChildren(List<Long> deptIds);
+
+    /**
+     * 批量级联删除部门（逻辑删除并清理角色-部门关联）
+     *
+     * @param deptIds 部门ID集合
+     * @return 结果
+     */
+    int deleteDeptsByIds(List<Long> deptIds);
+
 }

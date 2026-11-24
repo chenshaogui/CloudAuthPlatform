@@ -36,6 +36,9 @@
           <el-col :span="1.5">
             <el-button type="info" plain icon="Sort" @click="handleToggleExpandAll">展开/折叠</el-button>
           </el-col>
+          <el-col :span="1.5">
+            <el-button v-hasPermi="['system:dept:remove']" type="danger" plain icon="Delete" @click="handleCascadeDelete">级联删除</el-button>
+          </el-col>
           <right-toolbar v-model:show-search="showSearch" @query-table="getList"></right-toolbar>
         </el-row>
       </template>
@@ -148,11 +151,31 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="deleteDialog.visible" title="级联删除部门" width="500px" append-to-body destroy-on-close>
+      <el-alert type="warning" :closable="false" show-icon class="mb-2">
+        选中父级部门时，其下所有子部门会被一并删除；存在用户或岗位的部门不允许删除。
+      </el-alert>
+      <el-tree
+        ref="deptTreeRef"
+        :data="deleteDeptOptions"
+        show-checkbox
+        node-key="deptId"
+        default-expand-all
+        :props="{ label: 'deptName', children: 'children' } as any"
+      />
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="danger" :loading="deleteLoading" @click="submitCascadeDelete">确 定</el-button>
+          <el-button @click="cancelCascade">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="Dept" lang="ts">
-import { listDept, getDept, delDept, addDept, updateDept, listDeptExcludeChild } from '@/api/system/dept';
+import { listDept, getDept, delDept, addDept, updateDept, listDeptExcludeChild, cascadeDelDept } from '@/api/system/dept';
 import { DeptForm, DeptQuery, DeptVO } from '@/api/system/dept/types';
 import { UserVO } from '@/api/system/user/types';
 import { listUserByDeptId } from '@/api/system/user';
@@ -170,15 +193,22 @@ const deptList = ref<DeptVO[]>([]);
 const loading = ref(true);
 const showSearch = ref(true);
 const deptOptions = ref<DeptOptionsType[]>([]);
+const deleteDeptOptions = ref<DeptOptionsType[]>([]);
 const isExpandAll = ref(true);
 const deptUserList = ref<UserVO[]>([]);
+const deleteLoading = ref(false);
 
 const dialog = reactive<DialogOption>({
   visible: false,
   title: ''
 });
+const deleteDialog = reactive<DialogOption>({
+  visible: false,
+  title: ''
+});
 
 const deptTableRef = ref<ElTableInstance>();
+const deptTreeRef = ref<ElTreeInstance>();
 const queryFormRef = ref<ElFormInstance>();
 const deptFormRef = ref<ElFormInstance>();
 const initFormData: DeptForm = {
@@ -324,6 +354,40 @@ const handleDelete = async (row: DeptVO) => {
   await delDept(row.deptId);
   await getList();
   proxy?.$modal.msgSuccess('删除成功');
+};
+
+/** 级联删除按钮操作 */
+const handleCascadeDelete = async () => {
+  const res = await listDept();
+  const tree = proxy?.handleTree<DeptOptionsType>(res.data, 'deptId');
+  deleteDeptOptions.value = tree || [];
+  deptTreeRef.value?.setCheckedKeys([]);
+  deleteDialog.visible = true;
+};
+
+/** 取消级联删除 */
+const cancelCascade = () => {
+  deleteDialog.visible = false;
+  deptTreeRef.value?.setCheckedKeys([]);
+};
+
+/** 提交级联删除 */
+const submitCascadeDelete = async () => {
+  const deptIds = deptTreeRef.value?.getCheckedKeys() as (number | string)[];
+  if (!deptIds?.length) {
+    proxy?.$modal.msgWarning('请选择要删除的部门');
+    return;
+  }
+  await proxy?.$modal.confirm('确认级联删除选中的部门及其所有子部门吗？');
+  deleteLoading.value = true;
+  try {
+    await cascadeDelDept(deptIds);
+    proxy?.$modal.msgSuccess('删除成功');
+    deleteDialog.visible = false;
+    await getList();
+  } finally {
+    deleteLoading.value = false;
+  }
 };
 
 onMounted(() => {

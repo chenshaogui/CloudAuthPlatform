@@ -22,10 +22,12 @@ import io.gitee.chenshaogui.cloudauth.common.satoken.utils.LoginHelper;
 import io.gitee.chenshaogui.cloudauth.common.tenant.helper.TenantHelper;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysDept;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysRole;
+import io.gitee.chenshaogui.cloudauth.system.domain.SysRoleDept;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysUser;
 import io.gitee.chenshaogui.cloudauth.system.domain.bo.SysDeptBo;
 import io.gitee.chenshaogui.cloudauth.system.domain.vo.SysDeptVo;
 import io.gitee.chenshaogui.cloudauth.system.mapper.SysDeptMapper;
+import io.gitee.chenshaogui.cloudauth.system.mapper.SysRoleDeptMapper;
 import io.gitee.chenshaogui.cloudauth.system.mapper.SysRoleMapper;
 import io.gitee.chenshaogui.cloudauth.system.mapper.SysUserMapper;
 import io.gitee.chenshaogui.cloudauth.system.event.PermissionChangeEvent;
@@ -39,8 +41,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 部门管理 服务实现
@@ -55,6 +59,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     private final SysDeptMapper baseMapper;
     private final SysRoleMapper roleMapper;
     private final SysUserMapper userMapper;
+    private final SysRoleDeptMapper roleDeptMapper;
 
     /**
      * Spring 事件发布器（权限同步机制使用）
@@ -445,6 +450,64 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteDeptById(Long deptId) {
         int rows = baseMapper.deleteById(deptId);
+        if (rows > 0) {
+            publishDeptChange(PermissionChangeEvent.ChangeType.DELETE);
+        }
+        return rows;
+    }
+
+    /**
+     * 查询部门及其所有子部门的ID集合
+     *
+     * @param deptIds 选中的部门ID
+     * @return 选中部门及所有子孙部门的ID
+     */
+    @Override
+    public List<Long> selectDeptIdsWithChildren(List<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return new ArrayList<>();
+        }
+        Set<Long> ids = new LinkedHashSet<>(deptIds);
+        List<SysDept> allDepts = baseMapper.selectList(null);
+        boolean changed;
+        do {
+            changed = false;
+            for (SysDept dept : allDepts) {
+                if (ids.contains(dept.getDeptId()) || StringUtils.isBlank(dept.getAncestors())) {
+                    continue;
+                }
+                for (String ancestor : StringUtils.splitList(dept.getAncestors())) {
+                    Long ancestorId = Convert.toLong(ancestor, null);
+                    if (ancestorId != null && ids.contains(ancestorId)) {
+                        ids.add(dept.getDeptId());
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+        } while (changed);
+        return new ArrayList<>(ids);
+    }
+
+    /**
+     * 批量级联删除部门（逻辑删除并清理角色-部门关联）
+     *
+     * @param deptIds 部门ID集合
+     * @return 结果
+     */
+    @Caching(evict = {
+        @CacheEvict(cacheNames = CacheNames.SYS_DEPT, allEntries = true),
+        @CacheEvict(cacheNames = CacheNames.SYS_DEPT_AND_CHILD, allEntries = true)
+    })
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteDeptsByIds(List<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return 0;
+        }
+        int rows = baseMapper.deleteByIds(deptIds);
+        roleDeptMapper.delete(new LambdaUpdateWrapper<SysRoleDept>()
+            .in(SysRoleDept::getDeptId, deptIds));
         if (rows > 0) {
             publishDeptChange(PermissionChangeEvent.ChangeType.DELETE);
         }
