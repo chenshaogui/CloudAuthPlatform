@@ -86,30 +86,9 @@ public class SysClient extends BaseEntity {
 
 
     /**
-     * 关联应用keyId，用于客户端侧验签
-     */
-    private Long appKeyId;
-
-    /**
-     * 平台keyId，用于平台侧验签，取PC端应用的clientId去查询
-     */
-    private Long platformKeyId;
-
-
-    /**
      * 应用ip列表，用英文逗号隔开
      */
     private String appIpList;
-
-    /**
-     * 密钥池大小
-     */
-    private Integer keyPoolSize;
-
-    /**
-     * 签名key,32位自动生成
-     */
-    private String signKey;
 
     /**
      * 登录/注册/重置密码页面布局配置（JSON 字符串）

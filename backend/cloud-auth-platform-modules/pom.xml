@@ -11,7 +11,6 @@
     <modules>
         <module>cloud-auth-platform-system</module>
         <module>cloud-auth-platform-resource</module>
-        <module>cloud-auth-platform-casm</module>
     </modules>
 
     <artifactId>cloud-auth-platform-modules</artifactId>

@@ -64,7 +64,6 @@
         <el-table-column label="允许授权地址" align="center" prop="allowUrl" />
         <el-table-column label="Token活跃超时时间" align="center" prop="activeTimeout" />
         <el-table-column label="Token固定超时时间" align="center" prop="timeout" />
-        <el-table-column label="签名Key" align="center" prop="signKey" />
         <el-table-column key="status" label="状态" align="center">
           <template #default="scope">
             <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" @change="handleStatusChange(scope.row)"></el-switch>
@@ -74,9 +73,6 @@
           <template #default="scope">
             <el-tooltip content="修改" placement="top">
               <el-button v-hasPermi="['system:client:edit']" link type="primary" icon="Edit" @click="handleUpdate(scope.row)"></el-button>
-            </el-tooltip>
-            <el-tooltip content="绑定" placement="top">
-              <el-button v-hasPermi="['system:client:remove']" link type="primary" icon="Checked" @click="handleBinding(scope.row)"></el-button>
             </el-tooltip>
             <el-tooltip content="删除" placement="top">
               <el-button v-hasPermi="['system:client:remove']" link type="primary" icon="Delete" @click="handleDelete(scope.row)"></el-button>
@@ -236,26 +232,6 @@
         </div>
       </template>
     </el-dialog>
-    <el-dialog v-model="bindingDialog.visible" :title="bindingDialog.title" width="500px" append-to-body>
-      <el-form ref="bindingFormRef" :model="bindingForm" :rules="bindingRules" label-width="100px">
-        <el-form-item label="关联应用keyId" prop="appKeyId" label-width="auto">
-          <el-select v-model="bindingForm.appKeyId" placeholder="请选择关联应用keyId">
-            <el-option v-for="item in keyInfoList" :key="item.id" :label="item.keyName" :value="item.id"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="关联平台keyId" prop="platformKeyId" label-width="auto">
-          <el-select v-model="bindingForm.platformKeyId" placeholder="请选择关联平台keyId">
-            <el-option v-for="item in keyInfoList" :key="item.id" :label="item.keyName" :value="item.id"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button :loading="buttonLoading" type="primary" @click="bindingSubmitForm">确 定</el-button>
-          <el-button @click="bindingCancel">取 消</el-button>
-        </div>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -268,11 +244,9 @@ import {
   updateClient,
   changeStatus,
   generateClientSecretApi,
-  setKeysApi,
   listAppMenusApi
 } from '@/api/system/client';
-import { ClientVO, ClientQuery, ClientForm, BindingForm } from '@/api/system/client/types';
-import { listKeyInfoApi } from '@/api/system/key';
+import { ClientVO, ClientQuery, ClientForm } from '@/api/system/client/types';
 import { TEMPLATE_NAMES } from '@/views/auth';
 import { useRoute } from 'vue-router';
 
@@ -292,31 +266,12 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 
-const keyInfoList = ref<any[]>([]);
-
 const queryFormRef = ref<ElFormInstance>();
 const clientFormRef = ref<ElFormInstance>();
-const bindingFormRef = ref<ElFormInstance>();
-const bindingRules = {
-  appKeyId: [{ required: true, message: '关联应用keyId不能为空', trigger: 'blur' }],
-  platformKeyId: [{ required: true, message: '关联平台keyId不能为空', trigger: 'blur' }]
-};
 
 const dialog = reactive<DialogOption>({
   visible: false,
   title: ''
-});
-
-const bindingDialog = reactive<DialogOption>({
-  visible: false,
-  title: '关联keyId'
-});
-
-const bindingForm = ref<BindingForm>({
-  id: undefined,
-  appKeyId: undefined,
-  platformKeyId: undefined,
-  clientId: undefined
 });
 
 const menuType = ref('N');
@@ -360,8 +315,6 @@ const initFormData: ClientForm = {
   allowUrl: '*',
   menuUrl: '',
   menuId: undefined,
-  appKeyId: undefined,
-  platformKeyId: undefined,
   appIpList: undefined,
   layoutConfig: undefined,
   registerEnabled: '0', // 默认关闭（与后端 sys_client.register_enabled 默认值一致）
@@ -390,9 +343,7 @@ const data = reactive<PageData<ClientForm, ClientQuery>>({
     deviceType: [{ required: true, message: '设备类型不能为空', trigger: 'change' }],
     allowUrl: [{ required: true, message: '允许授权地址不能为空', trigger: 'blue' }],
     menuId: [{ required: true, message: '应用绑定类型不能为空', trigger: 'change' }],
-    menuUrl: [{ required: true, message: '应用路径不能为空', trigger: 'blue' }],
-    appKeyId: [{ required: true, message: '应用绑定类型不能为空', trigger: 'change' }],
-    platformKeyId: [{ required: true, message: '平台绑定类型不能为空', trigger: 'change' }]
+    menuUrl: [{ required: true, message: '应用路径不能为空', trigger: 'blue' }]
   }
 });
 
@@ -416,39 +367,6 @@ const getAppList = async () => {
 const cancel = () => {
   reset();
   dialog.visible = false;
-};
-
-const bindingCancel = () => {
-  bindingReset();
-  bindingDialog.visible = false;
-};
-
-const bindingReset = () => {
-  bindingForm.value = {
-    id: undefined,
-    appKeyId: undefined,
-    platformKeyId: undefined,
-    clientId: undefined
-  };
-};
-
-const bindingSubmitForm = async () => {
-  bindingFormRef.value?.validate(async (valid) => {
-    if (valid) {
-      buttonLoading.value = true;
-      try {
-        const res = await setKeysApi(bindingForm.value);
-        console.log('res', res);
-        proxy?.$modal.msgSuccess('关联成功');
-        bindingCancel();
-        getList();
-      } catch (error) {
-        console.log(error);
-      } finally {
-        buttonLoading.value = false;
-      }
-    }
-  });
 };
 
 /** 表单重置 */
@@ -550,15 +468,6 @@ const submitForm = () => {
   });
 };
 
-const handleBinding = async (row?: ClientVO) => {
-  getKeyList(row?.clientId);
-  bindingDialog.visible = true;
-  bindingForm.value.id = row?.id;
-  bindingForm.value.appKeyId = row?.appKeyId || undefined;
-  bindingForm.value.platformKeyId = row?.platformKeyId || undefined;
-  bindingForm.value.clientId = row?.clientId || undefined;
-};
-
 /** 删除按钮操作 */
 const handleDelete = async (row?: ClientVO) => {
   const _ids = row?.id || ids.value;
@@ -597,11 +506,6 @@ const handleStatusChange = async (row: ClientVO) => {
 const generateClientSecret = async () => {
   const data = await generateClientSecretApi();
   form.value.clientSecret = data.data;
-};
-
-const getKeyList = async (clientId: string) => {
-  const res = await listKeyInfoApi({ keyType: 'PEK', clientId });
-  keyInfoList.value = res.data;
 };
 
 /**

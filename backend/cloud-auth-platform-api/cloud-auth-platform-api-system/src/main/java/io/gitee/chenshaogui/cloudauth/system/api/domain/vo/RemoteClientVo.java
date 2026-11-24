@@ -78,29 +78,9 @@ public class RemoteClientVo implements Serializable {
     private Long menuId;
 
     /**
-     * 关联应用keyId，用于客户端侧验签
-     */
-    private Long appKeyId;
-
-    /**
-     * 平台keyId，用于平台侧验签
-     */
-    private Long platformKeyId;
-
-    /**
      * 应用ip列表，用英文逗号隔开
      */
     private String appIpList;
-
-    /**
-     * 密钥池大小
-     */
-    private Integer keyPoolSize;
-
-    /**
-     * 签名key
-     */
-    private String signKey;
 
     /**
      * 登录/注册/重置密码页面布局配置（JSON 字符串）

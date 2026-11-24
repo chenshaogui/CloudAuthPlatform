@@ -92,25 +92,9 @@ public class SysClientBo extends BaseEntity {
 
 
     /**
-     * 关联应用keyId
-     */
-    private Long appKeyId;
-
-    /**
-     * 平台keyId
-     */
-    private Long platformKeyId;
-
-
-    /**
      * 应用ip列表
      */
     private String appIpList;
-
-    /**
-     * 签名key
-     */
-    private String signKey;
 
     /**
      * 登录/注册/重置密码页面布局配置（JSON 字符串）

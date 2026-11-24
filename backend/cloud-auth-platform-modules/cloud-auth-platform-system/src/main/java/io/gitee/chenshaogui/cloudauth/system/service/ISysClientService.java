@@ -3,7 +3,6 @@ package io.gitee.chenshaogui.cloudauth.system.service;
 import io.gitee.chenshaogui.cloudauth.common.mybatis.core.page.PageQuery;
 import io.gitee.chenshaogui.cloudauth.common.mybatis.core.page.TableDataInfo;
 import io.gitee.chenshaogui.cloudauth.system.domain.bo.SysClientBo;
-import io.gitee.chenshaogui.cloudauth.system.domain.bo.SysClientKeysBo;
 import io.gitee.chenshaogui.cloudauth.system.domain.vo.SysClientVo;
 
 import java.util.Collection;
@@ -70,11 +69,4 @@ public interface ISysClientService {
      * 校验并批量删除客户端管理信息
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
-
-
-
-    /**
-     * 修改客户端管理
-     */
-    Boolean updateByKeysBo(SysClientKeysBo bo);
 }

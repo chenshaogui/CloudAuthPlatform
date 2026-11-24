@@ -13,7 +13,6 @@
         <module>cloud-auth-platform-api-system</module>
         <module>cloud-auth-platform-api-resource</module>
         <module>cloud-auth-platform-api-workflow</module>
-        <module>cloud-auth-platform-api-casm</module>
     </modules>
 
     <artifactId>cloud-auth-platform-api</artifactId>

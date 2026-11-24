@@ -31,11 +31,4 @@ public interface GlobalConstants {
      * 三方认证 redis key
      */
     String SOCIAL_AUTH_CODE_KEY = GLOBAL_REDIS_KEY + "social_auth_codes:";
-
-
-    /**
-     * 全局 casm key (业务无关的key)
-     */
-    String GLOBAL_CASM_KEY = "casm-center:";
-
 }

@@ -87,18 +87,4 @@ public interface CacheNames {
     String ONLINE_TOKEN = "online_tokens";
 
 
-    /**
-     * 密钥信息
-     */
-    String SYS_KEY_INFO = "sys_key_info";
-
-    /**
-     * 密钥轮换信息
-     */
-    String SYS_KEY_ROTATION = "sys_key_rotation";
-
-    /**
-     * 客户端
-     */
-    String SYS_CLIENT_CASM = GlobalConstants.GLOBAL_REDIS_KEY + "sys_client_casm#30d";
 }

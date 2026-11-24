@@ -1,7 +1,6 @@
 package io.gitee.chenshaogui.cloudauth.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import io.gitee.chenshaogui.cloudauth.system.domain.bo.SysClientKeysBo;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -126,17 +125,5 @@ public class SysClientController extends BaseController {
         // 生成 32 字节的 Base64 编码随机字符串
         StringKeyGenerator keyGenerator = new Base64StringKeyGenerator(Base64.getUrlEncoder().withoutPadding(), 32);
         return R.ok("生成秘钥",keyGenerator.generateKey());
-    }
-
-
-    /**
-     * 修改客户端管理
-     */
-    @SaCheckPermission("system:client:edit")
-    @Log(title = "客户端管理", businessType = BusinessType.UPDATE)
-    @RepeatSubmit()
-    @PutMapping("/keys/set")
-    public R<Void> setKeys(@Validated(EditGroup.class) @RequestBody SysClientKeysBo bo) {
-        return toAjax(sysClientService.updateByKeysBo(bo));
     }
 }

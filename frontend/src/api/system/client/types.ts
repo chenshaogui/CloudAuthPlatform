@@ -124,14 +124,6 @@ export interface ClientForm extends BaseEntity {
    */
   menuId: string;
   /**
-   * 绑定密钥id
-   */
-  appKeyId: string;
-  /**
-   * 绑定平台密钥id
-   */
-  platformKeyId: string;
-  /**
    * 应用 ip列表
    */
   appIpList: string;
@@ -177,38 +169,4 @@ export interface ClientQuery extends PageQuery {
    * 状态（0正常 1停用）
    */
   status?: string;
-}
-
-export interface BindingForm {
-  /**
-   * id
-   */
-  id: string | number;
-  /**
-   * 绑定密钥id
-   */
-  appKeyId: string;
-  /**
-   * 绑定平台密钥id
-   */
-  platformKeyId: string;
-  /**
-   * 绑定应用id
-   */
-  clientId: string;
-}
-
-export interface KeysForm {
-  /**
-   * 密钥id
-   */
-  id: string | number;
-  /**
-   * 绑定应用key
-   */
-  appKeyId: string;
-  /**
-   * 平台密钥id
-   */
-  platformKeyId: string;
 }

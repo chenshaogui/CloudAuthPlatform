@@ -11,7 +11,7 @@ import java.io.Serializable;
  * <p>由鉴权中心前端在进入 /ssologin、/login、/register、/resetPwd 时按 clientId 拉取，
  * 用于动态渲染登录/注册/重置密码页面（不同子系统客户端可指定不同模板与配置）。</p>
  *
- * <p>出于安全考虑，{@code clientSecret}、{@code appKeyId}、{@code signKey} 等敏感字段不出现在本 Vo 中。</p>
+ * <p>出于安全考虑，{@code clientSecret} 等敏感字段不出现在本 Vo 中。</p>
  *
  * @author CodeBuddy
  */

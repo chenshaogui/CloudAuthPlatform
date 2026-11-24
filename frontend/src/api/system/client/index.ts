@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 import { AxiosPromise } from 'axios';
-import { ClientVO, ClientForm, ClientQuery, KeysForm } from '@/api/system/client/types';
+import { ClientVO, ClientForm, ClientQuery } from '@/api/system/client/types';
 
 /**
  * 查询客户端管理列表
@@ -83,14 +83,6 @@ export function generateClientSecretApi() {
   return request({
     url: '/system/client/generateKey',
     method: 'get'
-  });
-}
-
-export function setKeysApi(data: KeysForm) {
-  return request({
-    url: '/system/client/keys/set',
-    method: 'put',
-    data
   });
 }
 

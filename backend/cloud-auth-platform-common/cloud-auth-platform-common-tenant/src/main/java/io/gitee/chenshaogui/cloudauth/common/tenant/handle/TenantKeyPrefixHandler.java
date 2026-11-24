@@ -39,10 +39,6 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
             return super.map(name);
         }
 
-        if (StringUtils.contains(name, GlobalConstants.GLOBAL_CASM_KEY)) {
-            return super.map(name);
-        }
-
         String tenantId = TenantHelper.getTenantId();
         if (StringUtils.isBlank(tenantId)) {
             log.debug("无法获取有效的租户id -> Null");

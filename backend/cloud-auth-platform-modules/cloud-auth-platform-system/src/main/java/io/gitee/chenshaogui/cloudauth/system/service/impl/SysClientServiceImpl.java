@@ -5,7 +5,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -29,7 +28,6 @@ import io.gitee.chenshaogui.cloudauth.system.domain.SysRoleMenu;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysUserClientConfig;
 import io.gitee.chenshaogui.cloudauth.system.domain.SysUserRole;
 import io.gitee.chenshaogui.cloudauth.system.domain.bo.SysClientBo;
-import io.gitee.chenshaogui.cloudauth.system.domain.bo.SysClientKeysBo;
 import io.gitee.chenshaogui.cloudauth.system.domain.vo.SysClientVo;
 import io.gitee.chenshaogui.cloudauth.system.mapper.SysClientMapper;
 import io.gitee.chenshaogui.cloudauth.system.mapper.SysClientRoleMapper;
@@ -192,7 +190,6 @@ public class SysClientServiceImpl implements ISysClientService {
         }
         add.setClientId(SecureUtil.md5(clientKey + clientSecret));
 
-        add.setSignKey(SecureUtil.md5(RandomUtil.randomString(32)));
         // 增加菜单绑定
         bindMenuInfo(bo, add);
         // 增加与管理员角色绑定
@@ -264,7 +261,7 @@ public class SysClientServiceImpl implements ISysClientService {
     /**
      * 修改客户端管理
      */
-    @CacheEvict(cacheNames = { CacheNames.SYS_CLIENT, CacheNames.SYS_CLIENT_CASM }, key = "#bo.clientId")
+    @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, key = "#bo.clientId")
     @Override
     public Boolean updateByBo(SysClientBo bo) {
         if(bo.getMenuId()!=null){
@@ -291,7 +288,7 @@ public class SysClientServiceImpl implements ISysClientService {
      *
      * <p>停用客户端时强制该客户端在线用户下线，防止已发 token 在有效期内继续访问</p>
      */
-    @CacheEvict(cacheNames = { CacheNames.SYS_CLIENT, CacheNames.SYS_CLIENT_CASM }, key = "#clientId")
+    @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, key = "#clientId")
     @Override
     public int updateClientStatus(String clientId, String status) {
         int rows = baseMapper.update(null,
@@ -320,7 +317,7 @@ public class SysClientServiceImpl implements ISysClientService {
      * <p>注意：不删除客户端绑定的应用菜单（及其子树），仅解除 {@code sys_client.menu_id} 绑定关系，
      * 应用菜单树保留、可重新绑定</p>
      */
-    @CacheEvict(cacheNames = { CacheNames.SYS_CLIENT, CacheNames.SYS_CLIENT_CASM }, allEntries = true)
+    @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
@@ -385,17 +382,6 @@ public class SysClientServiceImpl implements ISysClientService {
         lqw.orderByAsc(SysClient::getId);
         return baseMapper.selectVoList(lqw);
     }
-
-    /**
-     * 修改客户端管理
-     */
-    @CacheEvict(cacheNames = { CacheNames.SYS_CLIENT, CacheNames.SYS_CLIENT_CASM }, key = "#bo.clientId")
-    @Override
-    public Boolean updateByKeysBo(SysClientKeysBo bo) {
-        SysClient update = MapstructUtils.convert(bo, SysClient.class);
-        return baseMapper.updateById(update) > 0;
-    }
-
     /**
      * 发布客户端变更事件（走全网广播）
      *
