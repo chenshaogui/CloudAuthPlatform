@@ -103,11 +103,6 @@
             <artifactId>cloud-auth-platform-api-resource</artifactId>
         </dependency>
 
-        <!-- RuoYi Api System -->
-        <dependency>
-            <groupId>io.gitee.chenshaogui.cloudauth</groupId>
-            <artifactId>cloud-auth-platform-api-workflow</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

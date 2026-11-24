@@ -21,7 +21,6 @@
         <module>cloud-auth-platform-common-satoken</module>
         <module>cloud-auth-platform-common-web</module>
         <module>cloud-auth-platform-common-mybatis</module>
-        <module>cloud-auth-platform-common-job</module>
         <module>cloud-auth-platform-common-dubbo</module>
         <module>cloud-auth-platform-common-seata</module>
         <module>cloud-auth-platform-common-loadbalancer</module>

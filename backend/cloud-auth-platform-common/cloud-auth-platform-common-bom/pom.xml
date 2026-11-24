@@ -89,13 +89,6 @@
                 <version>${revision}</version>
             </dependency>
 
-            <!-- 定时任务 -->
-            <dependency>
-                <groupId>io.gitee.chenshaogui.cloudauth</groupId>
-                <artifactId>cloud-auth-platform-common-job</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
             <!-- RPC服务 -->
             <dependency>
                 <groupId>io.gitee.chenshaogui.cloudauth</groupId>

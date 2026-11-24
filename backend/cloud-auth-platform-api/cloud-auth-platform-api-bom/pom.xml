@@ -34,13 +34,6 @@
                 <version>${revision}</version>
             </dependency>
 
-            <!-- workflow接口 -->
-            <dependency>
-                <groupId>io.gitee.chenshaogui.cloudauth</groupId>
-                <artifactId>cloud-auth-platform-api-workflow</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 </project>

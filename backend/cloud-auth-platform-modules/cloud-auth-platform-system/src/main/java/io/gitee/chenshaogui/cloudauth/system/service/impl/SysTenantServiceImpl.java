@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import io.gitee.chenshaogui.cloudauth.common.core.constant.CacheNames;
 import io.gitee.chenshaogui.cloudauth.common.core.constant.Constants;
 import io.gitee.chenshaogui.cloudauth.common.core.constant.SystemConstants;
@@ -32,7 +31,6 @@ import io.gitee.chenshaogui.cloudauth.system.domain.vo.SysTenantVo;
 import io.gitee.chenshaogui.cloudauth.system.event.PermissionChangeEvent;
 import io.gitee.chenshaogui.cloudauth.system.mapper.*;
 import io.gitee.chenshaogui.cloudauth.system.service.ISysTenantService;
-import io.gitee.chenshaogui.cloudauth.workflow.api.RemoteWorkflowService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
@@ -67,9 +65,6 @@ public class SysTenantServiceImpl implements ISysTenantService {
      * Spring 事件发布器（权限同步机制使用）
      */
     private final ApplicationEventPublisher eventPublisher;
-
-    @DubboReference(mock = "true")
-    private RemoteWorkflowService remoteWorkflowService;
 
     /**
      * 查询租户
@@ -221,8 +216,6 @@ public class SysTenantServiceImpl implements ISysTenantService {
         }
         configMapper.insertBatch(sysConfigList);
 
-        // 新增租户流程定义
-        remoteWorkflowService.syncDef(tenantId);
         return true;
     }
 
