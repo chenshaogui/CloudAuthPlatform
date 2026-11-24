@@ -71,6 +71,13 @@ public interface ISysDictTypeService {
     void deleteDictTypeByIds(List<Long> dictIds);
 
     /**
+     * 级联删除字典类型及其下所有字典数据
+     *
+     * @param dictIds 需要删除的字典类型ID
+     */
+    void cascadeDeleteDictTypeByIds(List<Long> dictIds);
+
+    /**
      * 重置字典缓存数据
      */
     void resetDictCache();

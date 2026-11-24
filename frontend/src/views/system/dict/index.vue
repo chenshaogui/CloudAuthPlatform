@@ -44,6 +44,19 @@
             </el-button>
           </el-col>
           <el-col :span="1.5">
+            <el-button
+              v-hasPermi="['system:dict:remove']"
+              type="danger"
+              plain
+              icon="WarningFilled"
+              :loading="cascadeLoading"
+              :disabled="multiple || cascadeLoading"
+              @click="handleCascadeDelete()"
+            >
+              级联删除
+            </el-button>
+          </el-col>
+          <el-col :span="1.5">
             <el-button v-hasPermi="['system:dict:export']" type="warning" plain icon="Download" @click="handleExport">导出</el-button>
           </el-col>
           <el-col :span="1.5">
@@ -109,13 +122,14 @@
 
 <script setup name="Dict" lang="ts">
 import { useDictStore } from '@/store/modules/dict';
-import { listType, getType, delType, addType, updateType, refreshCache } from '@/api/system/dict/type';
+import { listType, getType, delType, addType, updateType, refreshCache, cascadeDelType } from '@/api/system/dict/type';
 import { DictTypeForm, DictTypeQuery, DictTypeVO } from '@/api/system/dict/type/types';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
 const typeList = ref<DictTypeVO[]>([]);
 const loading = ref(true);
+const cascadeLoading = ref(false);
 const showSearch = ref(true);
 const ids = ref<Array<number | string>>([]);
 const single = ref(true);
@@ -222,6 +236,23 @@ const handleDelete = async (row?: DictTypeVO) => {
   await delType(dictIds);
   getList();
   proxy?.$modal.msgSuccess('删除成功');
+};
+/** 级联删除按钮操作（字典类型及其字典数据） */
+const handleCascadeDelete = async () => {
+  if (!ids.value.length) {
+    proxy?.$modal.msgWarning('请选择要删除的字典');
+    return;
+  }
+  await proxy?.$modal.confirm('是否确认级联删除所选字典及其所有字典数据？此操作不可恢复。');
+  cascadeLoading.value = true;
+  try {
+    await cascadeDelType(ids.value);
+    useDictStore().cleanDict();
+    await getList();
+    proxy?.$modal.msgSuccess('删除成功');
+  } finally {
+    cascadeLoading.value = false;
+  }
 };
 /** 导出按钮操作 */
 const handleExport = () => {

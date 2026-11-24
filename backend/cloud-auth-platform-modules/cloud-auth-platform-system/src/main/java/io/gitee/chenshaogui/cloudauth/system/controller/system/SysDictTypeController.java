@@ -109,6 +109,19 @@ public class SysDictTypeController extends BaseController {
     }
 
     /**
+     * 级联删除字典类型及其字典数据
+     *
+     * @param dictIds 字典ID串
+     */
+    @SaCheckPermission("system:dict:remove")
+    @Log(title = "字典类型", businessType = BusinessType.DELETE)
+    @PostMapping("/cascade")
+    public R<Void> cascadeRemove(@RequestBody List<Long> dictIds) {
+        dictTypeService.cascadeDeleteDictTypeByIds(dictIds);
+        return R.ok();
+    }
+
+    /**
      * 刷新字典缓存
      */
     @SaCheckPermission("system:dict:remove")

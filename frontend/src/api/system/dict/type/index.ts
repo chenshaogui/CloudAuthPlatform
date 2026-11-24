@@ -45,6 +45,15 @@ export function delType(dictId: string | number | Array<string | number>) {
   });
 }
 
+// 级联删除字典类型及其字典数据
+export function cascadeDelType(dictIds: Array<string | number>) {
+  return request({
+    url: '/system/dict/type/cascade',
+    method: 'post',
+    data: dictIds
+  });
+}
+
 // 刷新字典缓存
 export function refreshCache() {
   return request({

@@ -149,6 +149,36 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     }
 
     /**
+     * 级联删除字典类型及其下所有字典数据
+     *
+     * @param dictIds 需要删除的字典类型ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cascadeDeleteDictTypeByIds(List<Long> dictIds) {
+        if (CollUtil.isEmpty(dictIds)) {
+            return;
+        }
+        List<SysDictType> list = baseMapper.selectByIds(dictIds);
+        if (CollUtil.isEmpty(list)) {
+            return;
+        }
+        List<String> dictTypes = list.stream()
+            .map(SysDictType::getDictType)
+            .filter(StringUtils::isNotBlank)
+            .toList();
+        if (CollUtil.isNotEmpty(dictTypes)) {
+            dictDataMapper.delete(new LambdaQueryWrapper<SysDictData>()
+                .in(SysDictData::getDictType, dictTypes));
+        }
+        baseMapper.deleteByIds(dictIds);
+        list.forEach(x -> {
+            CacheUtils.evict(CacheNames.SYS_DICT, x.getDictType());
+            CacheUtils.evict(CacheNames.SYS_DICT_TYPE, x.getDictType());
+        });
+    }
+
+    /**
      * 重置字典缓存数据
      */
     @Override
