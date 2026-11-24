@@ -28,4 +28,22 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/../../script/config/nacos/DEFAULT_GROUP</directory>
+                <includes>
+                    <include>application-common.yml</include>
+                    <include>common-local.yml</include>
+                    <include>datasource.yml</include>
+                    <include>auth-local.yml</include>
+                    <include>gateway-local.yml</include>
+                    <include>resource-local.yml</include>
+                    <include>system-local.yml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+    </build>
+
 </project>

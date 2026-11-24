@@ -1,22 +1,24 @@
 # nacos 配置
-# 4 个变量来自根 pom.xml 的 profile (local/dev/pub)，
-# 构建时通过 maven-resources-plugin 占位符替换注入
 spring:
   cloud:
     nacos:
-      server-addr: ${nacos.server-addr}
+      server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
       discovery:
-        server-addr: ${nacos.server-addr}
-        namespace: ${nacos.namespace}
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        namespace: ${NACOS_NAMESPACE:}
         group: ${USERDOMAIN_ROAMINGPROFILE:LOCAL_GROUP}
       config:
-        server-addr: ${nacos.server-addr}
-        namespace: ${nacos.namespace}
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        namespace: ${NACOS_NAMESPACE:}
         file-extension: yaml
-      username: ${nacos.username}
-      password: ${nacos.password}
+      username: ${NACOS_USERNAME:}
+      password: ${NACOS_PASSWORD:}
   config:
     import:
+      - classpath:common-local.yml
+      - classpath:application-common.yml
+      - classpath:datasource.yml
+      - classpath:${spring.application.name}-local.yml
       - optional:nacos:common-${spring.profiles.active:local}.yml
       - optional:nacos:application-common.yml
       - optional:nacos:datasource.yml
