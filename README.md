@@ -28,7 +28,7 @@ The backend and frontend are based on the RuoYi ecosystem; retain the upstream n
 | --- | --- |
 | `qychan/cloud-auth-platform:2.5.1` | 固定版本，推荐生产环境使用 |
 | `qychan/cloud-auth-platform:latest` | 最新版本 |
-| `sha256:c608d9277e832eb1121f200c4f9abe72af451f73ae9e29a49a33823a725d681e` | `latest` / `2.5.1` 当前对应 digest |
+| `sha256:6dce8b949ac626a18f434acd64e1deb9136f3c8fa5a1449606786b5d649ddfb8` | `latest` / `2.5.1` 当前对应 digest |
 
 镜像内 nginx 监听 `80` 端口，根路径会重定向到 `/cloudAuthPlatform/`；`/cloudAuthPlatform/prod-api/` 会反向代理到容器内 `127.0.0.1:9215` 的后端服务。部署时只需映射容器 `80` 端口，无需单独暴露 `9215`。
 
