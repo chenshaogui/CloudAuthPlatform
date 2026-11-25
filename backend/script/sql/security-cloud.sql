@@ -4448,10 +4448,6 @@ CREATE TABLE `sys_oss` (
   PRIMARY KEY (`oss_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='OSS对象存储表';
 
-INSERT INTO `sys_oss` (`oss_id`, `tenant_id`, `file_name`, `original_name`, `file_suffix`, `url`, `ext1`, `create_dept`, `create_time`, `create_by`, `update_time`, `update_by`, `service`) VALUES
-(2118180805897670657, '000000', 'store-test-1257035565/2026/11/05/c0a57fff4d404d5895311e3d9221576c.jpg', '1.jpg', '.jpg', 'https://store-test-1257035565.cos.ap-guangzhou.myqcloud.com/store-test-1257035565/2026/11/05/c0a57fff4d404d5895311e3d9221576c.jpg', '{"bizType":null,"fileSize":113128,"contentType":null,"source":null,"uploadIp":null,"remark":null,"tags":null,"refId":null,"refType":null,"isTemp":null,"md5":null}', -1, '2026-11-05 11:17:13', -1, '2026-11-05 11:17:13', -1, 'qcloud'),
-(2118181170311385089, '000000', 'store-test-1257035565/2026/11/05/527bc7ce82034e4f80477aa7e4dcbf30.jpg', '2.jpg', '.jpg', 'https://store-test-1257035565.cos.ap-guangzhou.myqcloud.com/store-test-1257035565/2026/11/05/527bc7ce82034e4f80477aa7e4dcbf30.jpg', '{"bizType":null,"fileSize":49480,"contentType":null,"source":null,"uploadIp":null,"remark":null,"tags":null,"refId":null,"refType":null,"isTemp":null,"md5":null}', -1, '2026-11-05 11:18:40', -1, '2026-11-05 11:18:40', -1, 'qcloud');
-
 DROP TABLE IF EXISTS `sys_oss_config`;
 
 CREATE TABLE `sys_oss_config` (
