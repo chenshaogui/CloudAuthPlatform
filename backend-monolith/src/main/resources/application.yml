@@ -1,0 +1,16 @@
+server:
+  port: 9215
+
+spring:
+  application:
+    name: monolith
+  profiles:
+    active: local
+  config:
+    import:
+      - classpath:application-common.yml
+      - classpath:common-local.yml
+      - classpath:datasource.yml
+      - classpath:auth-local.yml
+      - classpath:system-local.yml
+      - classpath:resource-local.yml

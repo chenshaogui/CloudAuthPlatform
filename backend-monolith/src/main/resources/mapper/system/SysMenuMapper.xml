@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    菜单子树导出（selectMenusById）已迁移到 Java 侧实现：
+    原先依赖数据库函数 get_menu_child_ids 递归，函数缺失/版本不一致或 GROUP_CONCAT 被截断时
+    只会导出一层子菜单（底层菜单丢失）。现由 SysMenuServiceImpl#selectMenuExportListById 在内存中递归展开。
+-->
+<mapper namespace="io.gitee.chenshaogui.cloudauth.system.mapper.SysMenuMapper">
+
+</mapper>

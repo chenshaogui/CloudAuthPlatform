@@ -267,6 +267,15 @@ public class TokenController {
     }
 
     /**
+     * 兼容旧前端的租户下拉框路径（/auth/tenant）
+     */
+    @RateLimiter(time = 60, count = 20, limitType = LimitType.IP)
+    @GetMapping("/tenant")
+    public R<LoginTenantVo> tenant(HttpServletRequest request) throws Exception {
+        return tenantList(request);
+    }
+
+    /**
      * 通过用户名称发送短信验证码
      *
      * @param smsBody 短信消息体

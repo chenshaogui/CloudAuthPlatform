@@ -1,0 +1,41 @@
+security:
+  ignore:
+    whites:
+      - /auth/code
+      - /auth/sendSmsCode
+      - /auth/sendSmsCodeByReset
+      - /auth/loginByPhone
+      - /auth/sso/doLoginByPhone
+      - /auth/sendSmsCodeByPhone
+      - /auth/sso/auth
+      - /auth/sso/doLogin
+      - /auth/sso/checkTicket
+      - /auth/sso/pushS
+      - /auth/sso/login
+      - /auth/logout
+      - /auth/login
+      - /auth/binding/*
+      - /auth/register
+      - /auth/tenant/list
+      - /resource/sms/code
+      - /resource/sse/close
+      - /system/user/profile/updatePwdNoLogin
+      - /*/v3/api-docs
+      - /*/error
+      - /csrf
+      - /system/client/config/public
+
+spring:
+  cloud:
+    gateway:
+      requestLog: true
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+          routes:
+            - id: monolith
+              uri: http://127.0.0.1:9215
+              predicates:
+                - Path=/auth/**,/system/**,/monitor/**,/resource/**
