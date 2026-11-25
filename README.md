@@ -20,6 +20,15 @@ For local deployment, `backend/script/sql/security-cloud.sql` contains the boots
 
 The backend and frontend are based on the RuoYi ecosystem; retain the upstream notices and licenses included with those components.
 
+## 本地登录账号
+
+导入上述 SQL 初始化脚本并启动服务后，可使用以下账号登录管理后台：
+
+- 用户名：`admin`
+- 密码：`admin@123`
+
+> 该账号仅用于本地开发和演示，部署到生产环境前请务必修改默认密码。
+
 ## 页面展示
 
 ### 首页
