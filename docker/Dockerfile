@@ -14,8 +14,21 @@ RUN npm run build:prod
 FROM eclipse-temurin:17-jre-alpine
 
 ENV TZ=Asia/Shanghai \
-    SPRING_PROFILES_ACTIVE=local \
-    JAVA_OPTS="-Xms64m -Xmx256m -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=48m -XX:MaxDirectMemorySize=96m -Xss256k -XX:+UseSerialGC -Djava.security.egd=file:/dev/./urandom"
+    SPRING_PROFILES_ACTIVE=prod \
+    JAVA_XMS=64m \
+    JAVA_XMX=256m \
+    JAVA_METASPACE=128m \
+    JAVA_CODE_CACHE=48m \
+    JAVA_DIRECT_MEMORY=96m \
+    JAVA_THREAD_STACK=256k \
+    MYSQL_HOST=mysql \
+    MYSQL_PORT=3306 \
+    MYSQL_DATABASE=security-cloud \
+    MYSQL_USERNAME=root \
+    REDIS_HOST=redis \
+    REDIS_PORT=6379 \
+    REDIS_DATABASE=4 \
+    FRONTEND_URL=http://localhost/cloudAuthPlatform/index.html#
 
 RUN apk add --no-cache nginx tzdata fontconfig font-wqy-zenhei \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -23,7 +36,7 @@ RUN apk add --no-cache nginx tzdata fontconfig font-wqy-zenhei \
 
 COPY --from=backend-build /build/backend/target/cloud-auth-platform-monolith-2.5.1.jar /app/app.jar
 COPY --from=frontend-build /build/frontend/cloudAuthPlatform/ /usr/share/nginx/html/cloudAuthPlatform/
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

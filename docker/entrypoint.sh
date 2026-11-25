@@ -1,7 +1,16 @@
 #!/bin/sh
 set -e
 
-java $JAVA_OPTS -Dspring.profiles.active="${SPRING_PROFILES_ACTIVE:-local}" -jar /app/app.jar &
+if [ -z "$JAVA_OPTS" ]; then
+    JAVA_OPTS="-Xms${JAVA_XMS:-64m} -Xmx${JAVA_XMX:-256m}"
+    JAVA_OPTS="$JAVA_OPTS -XX:MaxMetaspaceSize=${JAVA_METASPACE:-128m}"
+    JAVA_OPTS="$JAVA_OPTS -XX:ReservedCodeCacheSize=${JAVA_CODE_CACHE:-48m}"
+    JAVA_OPTS="$JAVA_OPTS -XX:MaxDirectMemorySize=${JAVA_DIRECT_MEMORY:-96m}"
+    JAVA_OPTS="$JAVA_OPTS -Xss${JAVA_THREAD_STACK:-256k}"
+    JAVA_OPTS="$JAVA_OPTS -XX:+UseSerialGC -Djava.security.egd=file:/dev/./urandom"
+fi
+
+java $JAVA_OPTS -Dspring.profiles.active="${SPRING_PROFILES_ACTIVE:-prod}" -jar /app/app.jar &
 JAVA_PID=$!
 
 nginx -g 'daemon off;' &

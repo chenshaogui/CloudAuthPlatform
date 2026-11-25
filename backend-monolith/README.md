@@ -43,8 +43,8 @@ SPRING_PROFILES_ACTIVE=prod java -jar target/cloud-auth-platform-monolith-2.5.1.
 
 | 变量 | 说明 | 适用 |
 | --- | --- | --- |
-| `REDIS_HOST` / `REDIS_PASSWORD` | Redis 地址与密码 | dev / prod |
-| `MYSQL_HOST` / `MYSQL_USERNAME` / `MYSQL_PASSWORD` | MySQL 地址（含端口和库名）、账号、密码 | dev / prod |
+| `REDIS_HOST` / `REDIS_PORT` / `REDIS_DATABASE` / `REDIS_PASSWORD` | Redis 地址、端口、库号、密码 | dev / prod |
+| `MYSQL_HOST` / `MYSQL_PORT` / `MYSQL_DATABASE` / `MYSQL_USERNAME` / `MYSQL_PASSWORD` | MySQL 地址、端口、库名、账号、密码 | dev / prod |
 | `FRONTEND_URL` | 前端回调地址 | dev / prod |
 | `MAIL_*` / `SMS_*` | 邮件与短信厂商参数 | dev / prod |
 

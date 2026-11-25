@@ -50,9 +50,9 @@ spring:
   data:
     redis:
       host: ${redis.host}
-      port: 6379
-      password: ${REDIS_PASSWORD:123456}
-      database: 4
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:4}
       timeout: 10000
       ssl.enabled: false
   datasource:

@@ -20,6 +20,117 @@ For local deployment, `backend/script/sql/security-cloud.sql` contains the boots
 
 The backend and frontend are based on the RuoYi ecosystem; retain the upstream notices and licenses included with those components.
 
+## Docker 单容器部署
+
+镜像已发布到 Docker Hub，单个容器同时运行 `backend-monolith` 和已构建的前端静态资源：
+
+| 镜像 | 说明 |
+| --- | --- |
+| `qychan/cloud-auth-platform:2.5.1` | 固定版本，推荐生产环境使用 |
+| `qychan/cloud-auth-platform:latest` | 最新版本 |
+| `sha256:c608d9277e832eb1121f200c4f9abe72af451f73ae9e29a49a33823a725d681e` | `latest` / `2.5.1` 当前对应 digest |
+
+镜像内 nginx 监听 `80` 端口，根路径会重定向到 `/cloudAuthPlatform/`；`/cloudAuthPlatform/prod-api/` 会反向代理到容器内 `127.0.0.1:9215` 的后端服务。部署时只需映射容器 `80` 端口，无需单独暴露 `9215`。
+
+### 前置条件
+
+1. 已准备好 MySQL，并导入 `backend/script/sql/security-cloud.sql`。
+2. 已准备好 Redis。
+3. MySQL 和 Redis 必须能够从该容器访问；如果部署在宿主机上，Docker Desktop 可使用 `host.docker.internal`，Linux 可填写宿主机 IP 或使用 host 网络。
+4. 建议为容器分配不超过 `1g` 内存；镜像默认 JVM 参数已按 1G 容器限制调优。
+
+### 拉取并启动
+
+```bash
+docker pull qychan/cloud-auth-platform:2.5.1
+
+docker run -d \
+  --name cloud-auth-platform \
+  --restart unless-stopped \
+  -p 80:80 \
+  -m 1g --memory-swap 1g \
+  -e MYSQL_HOST=192.168.1.10 \
+  -e MYSQL_PORT=3306 \
+  -e MYSQL_DATABASE=security-cloud \
+  -e MYSQL_USERNAME=root \
+  -e MYSQL_PASSWORD='your-mysql-password' \
+  -e REDIS_HOST=192.168.1.10 \
+  -e REDIS_PORT=6379 \
+  -e REDIS_DATABASE=4 \
+  -e REDIS_PASSWORD='your-redis-password' \
+  -e FRONTEND_URL='http://192.168.1.20/cloudAuthPlatform/index.html#' \
+  qychan/cloud-auth-platform:2.5.1
+```
+
+启动后访问：
+
+```text
+http://服务器IP/cloudAuthPlatform/
+```
+
+### 环境变量
+
+| 变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `SPRING_PROFILES_ACTIVE` | `prod` | Spring Boot profile |
+| `MYSQL_HOST` | `mysql` | MySQL 主机 |
+| `MYSQL_PORT` | `3306` | MySQL 端口 |
+| `MYSQL_DATABASE` | `security-cloud` | 数据库名 |
+| `MYSQL_USERNAME` | `root` | 数据库用户名 |
+| `MYSQL_PASSWORD` | 空 | 数据库密码 |
+| `REDIS_HOST` | `redis` | Redis 主机 |
+| `REDIS_PORT` | `6379` | Redis 端口 |
+| `REDIS_DATABASE` | `4` | Redis 数据库序号 |
+| `REDIS_PASSWORD` | 空 | Redis 密码 |
+| `FRONTEND_URL` | `http://localhost/cloudAuthPlatform/index.html#` | 第三方登录 / SSO 回调使用的前端地址 |
+| `JAVA_XMS` | `64m` | JVM 初始堆 |
+| `JAVA_XMX` | `256m` | JVM 最大堆 |
+| `JAVA_METASPACE` | `128m` | JVM 最大元空间 |
+| `JAVA_CODE_CACHE` | `48m` | JVM 代码缓存 |
+| `JAVA_DIRECT_MEMORY` | `96m` | JVM 最大直接内存 |
+| `JAVA_THREAD_STACK` | `256k` | JVM 线程栈大小 |
+| `JAVA_OPTS` | 空 | 完整覆盖 JVM 参数；设置后上述 `JAVA_*` 拆分参数不再生效 |
+
+### Compose 示例
+
+```yaml
+services:
+  cloud-auth-platform:
+    image: qychan/cloud-auth-platform:2.5.1
+    container_name: cloud-auth-platform
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    mem_limit: 1g
+    memswap_limit: 1g
+    environment:
+      MYSQL_HOST: 192.168.1.10
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: security-cloud
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: your-mysql-password
+      REDIS_HOST: 192.168.1.10
+      REDIS_PORT: 6379
+      REDIS_DATABASE: 4
+      REDIS_PASSWORD: your-redis-password
+      FRONTEND_URL: http://192.168.1.20/cloudAuthPlatform/index.html#
+```
+
+### 常用运维命令
+
+```bash
+docker logs -f cloud-auth-platform
+docker ps --filter name=cloud-auth-platform
+docker stop cloud-auth-platform
+docker rm cloud-auth-platform
+```
+
+如需从源码自行构建镜像：
+
+```bash
+docker build -f docker/Dockerfile -t cloud-auth-platform:local --pull=false .
+```
+
 ## 本地登录账号
 
 导入上述 SQL 初始化脚本并启动服务后，可使用以下账号登录管理后台：
