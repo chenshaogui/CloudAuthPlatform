@@ -1,0 +1,6 @@
+redis:
+  host: 100.66.1.5
+mysql:
+  masterHost: 100.66.1.5:33306/security-cloud
+  masterUsername: root
+  masterPasswd: 123456

@@ -1,0 +1,63 @@
+# 安全配置
+security:
+  # 不校验白名单
+  ignore:
+    whites:
+      - /auth/code
+      - /auth/sendSmsCode
+      - /auth/sendSmsCodeByReset
+      - /auth/loginByPhone
+      - /auth/sso/doLoginByPhone
+      - /auth/sendSmsCodeByPhone
+      - /auth/sso/auth
+      - /auth/sso/doLogin
+      - /auth/sso/checkTicket
+      - /auth/sso/pushS
+      - /auth/sso/login
+      - /auth/logout
+      - /auth/login
+      - /auth/binding/*
+      - /auth/register
+      - /auth/tenant/list
+      - /resource/sms/code
+      - /resource/sse/close
+      - /system/user/profile/updatePwdNoLogin
+      - /*/v3/api-docs
+      - /*/error
+      - /csrf
+      - /system/client/config/public
+
+spring:
+  cloud:
+    # 网关配置
+    gateway:
+      # 打印请求日志(自定义)
+      requestLog: true
+      server:
+        webflux:
+          discovery:
+            locator:
+              lowerCaseServiceId: true
+              enabled: true
+          routes:
+            # 认证中心
+            - id: auth
+              uri: lb://auth
+              predicates:
+                - Path=/auth/**
+              filters:
+                - StripPrefix=1
+            # 系统模块
+            - id: system
+              uri: lb://system
+              predicates:
+                - Path=/system/**,/monitor/**
+              filters:
+                - StripPrefix=1
+            # 资源服务
+            - id: resource
+              uri: lb://resource
+              predicates:
+                - Path=/resource/**
+              filters:
+                - StripPrefix=1
