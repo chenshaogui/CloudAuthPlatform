@@ -4,21 +4,17 @@ import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpLogic;
-import io.gitee.chenshaogui.cloudauth.common.core.factory.YmlPropertySourceFactory;
 import io.gitee.chenshaogui.cloudauth.common.satoken.core.dao.PlusSaTokenDao;
 import io.gitee.chenshaogui.cloudauth.common.satoken.core.service.SaPermissionImpl;
 import io.gitee.chenshaogui.cloudauth.common.satoken.handler.SaTokenExceptionHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.PropertySource;
-
 /**
  * Sa-Token 配置
  *
  * @author Lion Li
  */
 @AutoConfiguration
-@PropertySource(value = "classpath:common-satoken.yml", factory = YmlPropertySourceFactory.class)
 public class SaTokenConfiguration {
 
     @Bean

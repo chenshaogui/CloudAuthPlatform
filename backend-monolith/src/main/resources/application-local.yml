@@ -1,0 +1,53 @@
+# 本地环境配置
+redis:
+  host: 100.66.1.5
+mysql:
+  masterHost: 100.66.1.5:33306/security-cloud
+  masterUsername: root
+  masterPasswd: '123456'
+datasource:
+  system-master:
+    url: jdbc:mysql://${mysql.masterHost}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    username: ${mysql.masterUsername}
+    password: ${mysql.masterPasswd}
+  gen:
+    url: jdbc:mysql://${mysql.masterHost}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    username: ${mysql.masterUsername}
+    password: ${mysql.masterPasswd}
+spring:
+  data:
+    redis:
+      password: '123456'
+justauth:
+  address: 'http://127.0.0.1:80/etc2-html/securitySystem/index.html#'
+mail:
+  enabled: false
+  host: smtp.163.com
+  port: 465
+  auth: true
+  from: noreply@example.invalid
+  user: noreply@example.invalid
+  pass: xxxxxxxxxx
+  starttlsEnable: true
+  sslEnable: true
+  timeout: 0
+  connectionTimeout: 0
+sms:
+  config-type: yaml
+  restricted: true
+  minute-max: 1
+  account-max: 30
+  blends:
+    alibaba:
+      supplier: alibaba
+      access-key-id: REPLACE_WITH_ACCESS_KEY_ID
+      access-key-secret: REPLACE_WITH_ACCESS_KEY_SECRET
+      signature: 您的短信签名
+      sdk-app-id: 您的sdkAppId
+    tencent:
+      supplier: tencent
+      access-key-id: REPLACE_WITH_ACCESS_KEY_ID
+      access-key-secret: REPLACE_WITH_ACCESS_KEY_SECRET
+      signature: null
+      sdk-app-id: 1400557219
+      template-id: 1284217

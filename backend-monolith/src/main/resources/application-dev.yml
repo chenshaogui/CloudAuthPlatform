@@ -1,0 +1,53 @@
+# 开发环境配置（可用环境变量覆盖）
+redis:
+  host: ${REDIS_HOST:localhost}
+mysql:
+  masterHost: ${MYSQL_HOST:localhost:3306/security-cloud}
+  masterUsername: ${MYSQL_USERNAME:root}
+  masterPasswd: ${MYSQL_PASSWORD:123456}
+datasource:
+  system-master:
+    url: jdbc:mysql://${mysql.masterHost}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    username: ${mysql.masterUsername}
+    password: ${mysql.masterPasswd}
+  gen:
+    url: jdbc:mysql://${mysql.masterHost}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    username: ${mysql.masterUsername}
+    password: ${mysql.masterPasswd}
+spring:
+  data:
+    redis:
+      password: ${REDIS_PASSWORD:123456}
+justauth:
+  address: ${FRONTEND_URL:http://127.0.0.1:80/etc2-html/securitySystem/index.html#}
+mail:
+  enabled: false
+  host: ${MAIL_HOST:smtp.example.com}
+  port: 465
+  auth: true
+  from: ${MAIL_FROM:noreply@example.com}
+  user: ${MAIL_USERNAME:}
+  pass: ${MAIL_PASSWORD:}
+  starttlsEnable: true
+  sslEnable: true
+  timeout: 0
+  connectionTimeout: 0
+sms:
+  config-type: yaml
+  restricted: true
+  minute-max: 1
+  account-max: 30
+  blends:
+    alibaba:
+      supplier: alibaba
+      access-key-id: ${SMS_ALIBABA_KEY_ID:}
+      access-key-secret: ${SMS_ALIBABA_KEY_SECRET:}
+      signature: ${SMS_ALIBABA_SIGNATURE:}
+      sdk-app-id: ${SMS_ALIBABA_SDK_APP_ID:}
+    tencent:
+      supplier: tencent
+      access-key-id: ${SMS_TENCENT_KEY_ID:}
+      access-key-secret: ${SMS_TENCENT_KEY_SECRET:}
+      signature: ${SMS_TENCENT_SIGNATURE:}
+      sdk-app-id: ${SMS_TENCENT_SDK_APP_ID:}
+      template-id: ${SMS_TENCENT_TEMPLATE_ID:}

@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
-import io.gitee.chenshaogui.cloudauth.common.core.factory.YmlPropertySourceFactory;
 import io.gitee.chenshaogui.cloudauth.common.core.utils.SpringUtils;
 import io.gitee.chenshaogui.cloudauth.common.mybatis.aspect.DataPermissionPointcutAdvisor;
 import io.gitee.chenshaogui.cloudauth.common.mybatis.handler.InjectionMetaObjectHandler;
@@ -22,7 +21,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Role;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -35,7 +33,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @EnableTransactionManagement(proxyTargetClass = true)
 @MapperScan("${mybatis-plus.mapperPackage}")
-@PropertySource(value = "classpath:common-mybatis.yml", factory = YmlPropertySourceFactory.class)
 public class MybatisPlusConfiguration {
 
     @Bean

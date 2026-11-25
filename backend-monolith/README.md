@@ -22,19 +22,33 @@
 
 ## 配置
 
-应用主配置为 `src/main/resources/application.yml`，默认端口 `9215`，应用名 `monolith`。它通过 `spring.config.import` 读取以下本地文件：
+配置按 Spring Profile 拆分，位于 `src/main/resources/`：
 
 ```text
-src/main/resources/config/
-  application-common.yml   公共配置（Undertow、Redis、Sa-Token、MyBatis、租户等）
-  common-local.yml         MySQL/Redis 连接地址
-  datasource.yml           动态数据源
-  auth-local.yml           验证码、密码策略、三方登录
-  system-local.yml         系统模块数据源
-  resource-local.yml       资源模块 SSE/WebSocket/邮件/短信
+application.yml         公共配置（端口、Undertow、Sa-Token、MyBatis、加解密、租户、SSE 等）
+application-local.yml   本地环境：写死本机 MySQL/Redis 地址，默认激活
+application-dev.yml     开发环境：通过环境变量提供连接信息，带本地默认值
+application-prod.yml    生产环境：密钥类参数必须通过环境变量提供
 ```
 
-首次部署前请根据环境修改 `common-local.yml` 中的 MySQL/Redis 地址。
+默认激活 `local`，可通过启动参数或环境变量切换：
+
+```bash
+java -jar target/cloud-auth-platform-monolith-2.5.1.jar --spring.profiles.active=dev
+# 或
+SPRING_PROFILES_ACTIVE=prod java -jar target/cloud-auth-platform-monolith-2.5.1.jar
+```
+
+各环境支持的主要变量：
+
+| 变量 | 说明 | 适用 |
+| --- | --- | --- |
+| `REDIS_HOST` / `REDIS_PASSWORD` | Redis 地址与密码 | dev / prod |
+| `MYSQL_HOST` / `MYSQL_USERNAME` / `MYSQL_PASSWORD` | MySQL 地址（含端口和库名）、账号、密码 | dev / prod |
+| `FRONTEND_URL` | 前端回调地址 | dev / prod |
+| `MAIL_*` / `SMS_*` | 邮件与短信厂商参数 | dev / prod |
+
+不再使用 Nacos，也没有 `config/` 子目录。本地开发只需修改 `application-local.yml` 中的连接地址。
 
 ## 构建与运行
 

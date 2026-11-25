@@ -1,16 +1,293 @@
+# cloud-auth-platform 单体应用公共配置
+# 环境差异见 application-{local|dev|prod}.yml
 server:
   port: 9215
-
+  undertow:
+    max-http-post-size: -1
+    buffer-size: 512
+    direct-buffers: true
+    threads:
+      io: 4
+      worker: 48
 spring:
   application:
     name: monolith
   profiles:
     active: local
+  threads:
+    virtual:
+      enabled: false
+  task:
+    execution:
+      thread-name-prefix: async-
+      mode: force
+  messages:
+    basename: i18n/messages_zh_CN
+    encoding: UTF-8
+  servlet:
+    multipart:
+      max-request-size: 20MB
+      max-file-size: 10MB
+  mvc:
+    static-path-pattern: /static/**
+    format:
+      date-time: yyyy-MM-dd HH:mm:ss
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      INDENT_OUTPUT: false
+      fail_on_empty_beans: false
+    deserialization:
+      fail_on_unknown_properties: false
+  bus:
+    id: ${spring.application.name}
+    base-packages: io.gitee.chenshaogui.cloudauth.**.event
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: REPLACE_WITH_USERNAME
+    password: REPLACE_WITH_PASSWORD
+  data:
+    redis:
+      host: ${redis.host}
+      port: 6379
+      password: ${REDIS_PASSWORD:123456}
+      database: 4
+      timeout: 10000
+      ssl.enabled: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    dynamic:
+      p6spy: true
+      seata: ${seata.enabled}
+      strict: true
+      hikari:
+        maxPoolSize: 20
+        minIdle: 10
+        connectionTimeout: 30000
+        validationTimeout: 5000
+        idleTimeout: 600000
+        maxLifetime: 1800000
+        keepaliveTime: 30000
+      primary: master
+      datasource:
+        master:
+          type: ${spring.datasource.type}
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: ${datasource.system-master.url}
+          username: ${datasource.system-master.username}
+          password: ${datasource.system-master.password}
+redisson:
+  keyPrefix: null
+  threads: 4
+  nettyThreads: 8
+  singleServerConfig:
+    clientName: ${spring.application.name}
+    connectionMinimumIdleSize: 8
+    connectionPoolSize: 32
+    idleConnectionTimeout: 10000
+    timeout: 3000
+    subscriptionConnectionPoolSize: 50
+lock4j:
+  acquire-timeout: 3000
+  expire: 30000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+    logfile:
+      external-file: ./logs/${spring.application.name}/console.log
+logging:
+  level:
+    org.springframework: warn
+    org.mybatis.spring.mapper: error
+    org.apache.fury: warn
+    io.micrometer: error
+    org.springframework.context.support.PostProcessorRegistrationDelegate: error
+  config: classpath:logback-plus.xml
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  check-same-token: false
+  is-concurrent: true
+  is-share: false
+  jwt-secret-key: abcdefghijklmnopqrstuvwxyz
+  dynamic-active-timeout: true
+  is-read-body: true
+  is-read-header: true
+  is-read-cookie: false
+mybatis-plus:
+  enableLogicDelete: true
+  mapperPackage: io.gitee.chenshaogui.cloudauth.**.mapper
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  typeAliasesPackage: io.gitee.chenshaogui.cloudauth.**.domain
+  global-config:
+    dbConfig:
+      idType: ASSIGN_ID
+      logicDeleteValue: 1
+      logicNotDeleteValue: 0
+      insertStrategy: NOT_NULL
+      updateStrategy: NOT_NULL
+      whereStrategy: NOT_NULL
+    banner: true
+  checkConfigLocation: false
+  configuration:
+    mapUnderscoreToCamelCase: true
+    autoMappingBehavior: FULL
+    autoMappingUnknownColumnBehavior: NONE
+    logImpl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+mybatis-encryptor:
+  enable: false
+  algorithm: BASE64
+  encode: BASE64
+  password: null
+  publicKey: null
+  privateKey: null
+api-decrypt:
+  enabled: true
+  headerFlag: encrypt-key
+  publicKey: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJnNwrj4hi/y3CCJu868ghCG5dUj8wZK++RNlTLcXoMmdZWEQ/u02RgD5LyLAXGjLOjbMtC+/J9qofpSGTKSx/MCAwEAAQ==
+  privateKey: MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAqhHyZfSsYourNxaY7Nt+PrgrxkiA50efORdI5U5lsW79MmFnusUA355oaSXcLhu5xxB38SMSyP2KvuKNPuH3owIDAQABAkAfoiLyL+Z4lf4Myxk6xUDgLaWGximj20CUf+5BKKnlrK+Ed8gAkM0HqoTt2UZwA5E2MzS4EI2gjfQhz5X28uqxAiEA3wNFxfrCZlSZHb0gn2zDpWowcSxQAgiCstxGUoOqlW8CIQDDOerGKH5OmCJ4Z21v+F25WaHYPxCFMvwxpcw99EcvDQIgIdhDTIqD2jfYjPTY8Jj3EDGPbH2HHuffvflECt3Ek60CIQCFRlCkHpi7hthhYhovyloRYsM+IS9h/0BzlEAuO0ktMQIgSPT3aFAgJYwKpqRYKlLDVcflZFCKY7u3UP8iWi1Qw0Y=
+xss:
+  enabled: true
+  excludeUrls:
+    - /system/notice
+springdoc:
+  api-docs:
+    enabled: true
+  info:
+    title: cloud-auth-platform 单体 PoC
+    description: auth/system/resource 合并单体，本地文件配置，无 Nacos/Dubbo
+    version: 2.5.1
+    contact:
+      name: ChenShaoGui
+      email: REPLACE_WITH_EMAIL
+      url: https://gitee.com/chenshaogui/cloud-auth-platform
+seata:
+  enabled: false
+  application-id: ${spring.application.name}
+  tx-service-group: ${spring.application.name}-group
   config:
-    import:
-      - classpath:application-common.yml
-      - classpath:common-local.yml
-      - classpath:datasource.yml
-      - classpath:auth-local.yml
-      - classpath:system-local.yml
-      - classpath:resource-local.yml
+    type: file
+  registry:
+    type: file
+  enable-auto-data-source-proxy: false
+tenant:
+  enable: true
+  excludes:
+    - sys_menu
+    - sys_area
+    - sys_tenant
+    - sys_tenant_package
+    - sys_role_dept
+    - sys_role_menu
+    - sys_user_post
+    - sys_user_role
+    - sys_client
+    - sys_oss_config
+    - flow_spel
+project:
+  client-admin-menuIds: 1,100,1001,1003,101,1008,1009,1010,1011,1012,123,1061,1062,1063,1064,1065,134,2001551332223283201,2001550621456527362,2001551038227738626,2001552371659894785,2001552463775199234
+security:
+  captcha:
+    enabled: true
+    type: CHAR
+    category: SHEAR
+    numberLength: 1
+    charLength: 4
+user:
+  password:
+    maxRetryCount: 5
+    lockTime: 10
+justauth:
+  type:
+    wechat_enterprise_cloudauth:
+      server-url: https://auth.example.invalid:8075
+      client-id: REPLACE_WITH_CLIENT_ID
+    maxkey:
+      server-url: http://sso.maxkey.top
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=maxkey
+    topiam:
+      server-url: http://127.0.0.1:1989/api/v1/authorize/y0q************spq***********8ol
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=topiam
+      scopes:
+        - openid
+        - email
+        - phone
+        - profile
+    qq:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=qq
+      union-id: false
+    weibo:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=weibo
+    gitee:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=gitee
+    dingtalk:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=dingtalk
+    baidu:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=baidu
+    csdn:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=csdn
+    coding:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=coding
+      coding-group-name: xx
+    oschina:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=oschina
+    alipay_wallet:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=alipay_wallet
+      alipay-public-key: REPLACE_WITH_ALIPAY_PUBLIC_KEY
+    wechat_open:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=wechat_open
+    wechat_mp:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=wechat_mp
+    wechat_enterprise:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=wechat_enterprise
+      agent-id: 1000100
+    gitlab:
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=gitlab
+    gitea:
+      server-url: ${JUSTAUTH_GITEA_SERVER_URL}
+      client-id: REPLACE_WITH_CLIENT_ID
+      client-secret: REPLACE_WITH_CLIENT_SECRET
+      redirect-uri: ${justauth.address}/social-callback?source=gitea
+sse:
+  enabled: true
+  path: /resource/sse
+websocket:
+  enabled: false
+  path: /websocket
+  allowedOrigins: '*'
