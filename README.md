@@ -1,16 +1,20 @@
 # Cloud Auth Platform
 
-This repository combines three related projects:
+> 英文版本：[README.en.md](README.en.md)
+
+This repository combines four related projects:
 
 | Directory | Description |
 | --- | --- |
 | `backend/` | Spring Cloud authorization and account services |
+| `backend-monolith/` | Independent monolithic backend: merges auth / system / resource, no Nacos / Dubbo / gateway; the Docker image is built from this module |
 | `client-oauth/` | Java OAuth/SSO client SDK |
 | `frontend/` | Vue administration console |
 
 ## Build
 
 - Backend: run `mvn -DskipTests package` from `backend/`.
+- Monolith backend: run `mvn -DskipTests package` from `backend-monolith/`.
 - OAuth client: run `mvn -DskipTests package` from `client-oauth/`.
 - Frontend: copy `frontend/.env.example` to a local Vite environment file, install the dependencies, and run `npm run dev` from `frontend/`.
 
@@ -19,6 +23,22 @@ Configure database, Nacos, OAuth and other deployment credentials through enviro
 For local deployment, `backend/script/sql/security-cloud.sql` contains the bootstrap data and `backend/script/config/nacos/DEFAULT_GROUP/` contains the configuration files to import into Nacos (`DEFAULT_GROUP`, public namespace).
 
 The backend and frontend are based on the RuoYi ecosystem; retain the upstream notices and licenses included with those components.
+
+## 单体后端（backend-monolith）
+
+`backend-monolith/` 是完全独立的单体后端，由微服务版 `backend/` 的源码移植而来，将原 `auth`、`system`、`resource` 三个服务合并到同一个 Spring Boot 应用中，以单个 JVM 运行，与微服务版没有代码或构建依赖。
+
+- 不依赖 Nacos、Dubbo、Spring Cloud Gateway 或 Seata：配置读取本地 `application-{local|dev|prod}.yml`，前端 API 由 nginx 反向代理到应用端口 `9215`。
+- 数据库初始化脚本共用 `backend/script/sql/security-cloud.sql`，不再维护独立的 SQL / Nacos 配置。
+- 下文的 Docker 单容器镜像即基于此模块构建。
+
+```bash
+cd backend-monolith
+mvn -DskipTests package
+java -Xms128m -Xmx256m -jar target/cloud-auth-platform-monolith-2.5.1.jar --spring.profiles.active=dev
+```
+
+默认激活 `local` 配置文件；`dev` / `prod` 通过 `MYSQL_*`、`REDIS_*`、`FRONTEND_URL` 等环境变量提供连接信息。详细配置与前端 nginx 转发示例见 `backend-monolith/README.md`。
 
 ## Docker 单容器部署
 
