@@ -24,7 +24,7 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 /**
- * SSO 跳转参数加密工具（与认证中心前端 securitySystem 的 utils/ssoQuery.ts 配套）。
+ * SSO 跳转参数加密工具（与认证中心前端 cloudAuthPlatform 的 utils/ssoQuery.ts 配套）。
  *
  * <p>把 {@code #/ssologin?client=xxx&redirect=yyy} 的明文 query 整体收进一个
  * {@code ?auth_request=xxx} 密文参数，避免 clientId、回跳地址在地址栏 / 日志中明文暴露。</p>

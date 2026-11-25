@@ -24,7 +24,7 @@ user:
 # 三方授权
 justauth:
   # 前端外网访问地址
-  address: https://auth.example.invalid/etc2-html/securitySystem/index.html#
+  address: https://auth.example.invalid/etc2-html/cloudAuthPlatform/index.html#
   type:
     wechat_enterprise_cloudauth:
       # 企业微信

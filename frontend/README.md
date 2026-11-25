@@ -19,11 +19,11 @@
 
 关键变量：
 
-- `VITE_APP_BASE_API`：浏览器侧 API 前缀，本项目统一为 `/securitySystem/prod-api`。
+- `VITE_APP_BASE_API`：浏览器侧 API 前缀，本项目统一为 `/cloudAuthPlatform/prod-api`。
 - `VITE_APP_PROXY_TARGET`：开发服务器代理目标。
   - 微服务模式：`http://127.0.0.1:9212`（网关）
   - 单体模式：`http://127.0.0.1:9215`（`backend-monolith`）
-- `VITE_APP_CONTEXT_PATH`：应用访问路径 `/securitySystem/`。
+- `VITE_APP_CONTEXT_PATH`：应用访问路径 `/cloudAuthPlatform/`。
 - `VITE_APP_PORT`：开发服务器端口，默认 `80`。
 - `VITE_APP_CLIENT_ID`：客户端 ID。
 - `VITE_APP_ENCRYPT`、`VITE_APP_RSA_PUBLIC_KEY`、`VITE_APP_RSA_PRIVATE_KEY`：接口加解密配置，必须与后端一致。
@@ -38,7 +38,7 @@ npm install
 npm run dev
 ```
 
-默认访问 `http://localhost/securitySystem/`。
+默认访问 `http://localhost/cloudAuthPlatform/`。
 
 切换到单体后端时，确认 `.env.development` 中：
 
@@ -52,7 +52,7 @@ VITE_APP_PROXY_TARGET = 'http://127.0.0.1:9215'
 VITE_APP_PROXY_TARGET = 'http://127.0.0.1:9212'
 ```
 
-前端业务代码无需改动，Vite 会把 `/securitySystem/prod-api` 剥离后转发到对应后端。
+前端业务代码无需改动，Vite 会把 `/cloudAuthPlatform/prod-api` 剥离后转发到对应后端。
 
 ## 构建
 
@@ -64,19 +64,19 @@ npm run build:prod
 npm run build:dev
 ```
 
-产物目录为 `securitySystem/`，部署时将其作为静态资源根目录访问 `/securitySystem/`。
+产物目录为 `cloudAuthPlatform/`，部署时将其作为静态资源根目录访问 `/cloudAuthPlatform/`。
 
 ## 部署对接
 
-生产构建使用相对 API 前缀 `/securitySystem/prod-api`，需由 nginx 反向代理到后端：
+生产构建使用相对 API 前缀 `/cloudAuthPlatform/prod-api`，需由 nginx 反向代理到后端：
 
-- 单体应用：转发到 `http://127.0.0.1:9215/`，并去掉 `/securitySystem/prod-api` 前缀。
+- 单体应用：转发到 `http://127.0.0.1:9215/`，并去掉 `/cloudAuthPlatform/prod-api` 前缀。
 - 微服务模式：转发到网关 `http://127.0.0.1:9212/`。
 
 示例：
 
 ```nginx
-location /securitySystem/prod-api/ {
+location /cloudAuthPlatform/prod-api/ {
     proxy_pass http://127.0.0.1:9215/;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;

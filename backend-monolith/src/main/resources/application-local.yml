@@ -19,7 +19,7 @@ spring:
     redis:
       password: '123456'
 justauth:
-  address: 'http://127.0.0.1:80/etc2-html/securitySystem/index.html#'
+  address: 'http://127.0.0.1:80/etc2-html/cloudAuthPlatform/index.html#'
 mail:
   enabled: false
   host: smtp.163.com

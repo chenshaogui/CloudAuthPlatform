@@ -79,7 +79,7 @@ sa-token:
     # sso-server 端主机地址
     server-url: https://example.com/uaa-gateway/auth
     # 前后端分离时需额外配置 auth-url（与 server-url 共存）
-    auth-url: https://example.com/etc2-html/securitySystem/index.html#/ssologin
+    auth-url: https://example.com/etc2-html/cloudAuthPlatform/index.html#/ssologin
     # 使用 HTTP 请求校验 ticket
     is-http: true
     # API 接口调用秘钥

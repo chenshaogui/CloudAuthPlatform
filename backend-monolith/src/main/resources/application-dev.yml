@@ -19,7 +19,7 @@ spring:
     redis:
       password: ${REDIS_PASSWORD:123456}
 justauth:
-  address: ${FRONTEND_URL:http://127.0.0.1:80/etc2-html/securitySystem/index.html#}
+  address: ${FRONTEND_URL:http://127.0.0.1:80/etc2-html/cloudAuthPlatform/index.html#}
 mail:
   enabled: false
   host: ${MAIL_HOST:smtp.example.com}

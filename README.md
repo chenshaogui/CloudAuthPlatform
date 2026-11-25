@@ -145,7 +145,7 @@ sa-token:
     client: <统一授权中心分配的客户端ID>
     secret-key: <客户端秘钥>
     server-url: http://127.0.0.1/thrid-api
-    auth-url: http://127.0.0.1/securitySystem/#/ssologin
+    auth-url: http://127.0.0.1/cloudAuthPlatform/#/ssologin
     is-http: true
   permit-paths:
     - /sso/**

@@ -122,7 +122,7 @@
 **响应示例**：
 
 ```json
-{ "code": 200, "msg": "ok", "data": "https://auth.example.com/securitySystem/sso/auth?client=xxx&redirect=...&timestamp=...&nonce=...&sign=..." }
+{ "code": 200, "msg": "ok", "data": "https://auth.example.com/cloudAuthPlatform/sso/auth?client=xxx&redirect=...&timestamp=...&nonce=...&sign=..." }
 ```
 
 **前端典型用法**：
@@ -195,7 +195,7 @@ window.location.href = '/sso/getSsoAuthUrl?back=' + encodeURIComponent('/dashboa
   "data": {
     "client": "system",
     "serverUrl": "https://auth.example.com",
-    "authUrl": "https://auth.example.com/securitySystem/sso/auth"
+    "authUrl": "https://auth.example.com/cloudAuthPlatform/sso/auth"
   }
 }
 ```

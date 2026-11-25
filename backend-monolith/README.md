@@ -68,10 +68,10 @@ Started CloudAuthMonolithApplication in 25 seconds
 
 ## 前端对接
 
-前端打包后仍使用原有相对 API 前缀 `/securitySystem/prod-api`。由于本版本没有 Spring Cloud Gateway，需要由 nginx 将该前缀转发到单体应用并去掉前缀：
+前端打包后仍使用原有相对 API 前缀 `/cloudAuthPlatform/prod-api`。由于本版本没有 Spring Cloud Gateway，需要由 nginx 将该前缀转发到单体应用并去掉前缀：
 
 ```nginx
-location /securitySystem/prod-api/ {
+location /cloudAuthPlatform/prod-api/ {
     proxy_pass http://127.0.0.1:9215/;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -80,7 +80,7 @@ location /securitySystem/prod-api/ {
 }
 ```
 
-这样 `/securitySystem/prod-api/auth/login` 会转发到本应用的 `/auth/login`，前端无需修改业务代码。
+这样 `/cloudAuthPlatform/prod-api/auth/login` 会转发到本应用的 `/auth/login`，前端无需修改业务代码。
 
 ## 本地登录账号
 

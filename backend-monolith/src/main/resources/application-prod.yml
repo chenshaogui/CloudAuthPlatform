@@ -19,7 +19,7 @@ spring:
     redis:
       password: ${REDIS_PASSWORD}
 justauth:
-  address: ${FRONTEND_URL:https://example.com/securitySystem/index.html#}
+  address: ${FRONTEND_URL:https://example.com/cloudAuthPlatform/index.html#}
 mail:
   enabled: false
   host: ${MAIL_HOST:smtp.example.com}

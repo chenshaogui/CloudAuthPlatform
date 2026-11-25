@@ -61,10 +61,10 @@ mvn -DskipTests package
 
 ## 前端对接
 
-前端开发环境的 API 前缀为 `/securitySystem/prod-api`，由 Vite 代理到网关端口 `9212`：
+前端开发环境的 API 前缀为 `/cloudAuthPlatform/prod-api`，由 Vite 代理到网关端口 `9212`：
 
 ```env
-VITE_APP_BASE_API = '/securitySystem/prod-api'
+VITE_APP_BASE_API = '/cloudAuthPlatform/prod-api'
 VITE_APP_PROXY_TARGET = 'http://127.0.0.1:9212'
 ```
 

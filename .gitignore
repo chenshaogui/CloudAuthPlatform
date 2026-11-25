@@ -4,6 +4,7 @@
 **/target/
 **/.flattened-pom.xml
 **/dist/
+frontend/cloudAuthPlatform/
 **/logs/
 **/*.log
 .idea/
