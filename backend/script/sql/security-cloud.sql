@@ -3783,8 +3783,8 @@ CREATE TABLE `sys_client` (
 INSERT INTO `sys_client` (`id`, `client_id`, `client_secret`, `client_key`, `grant_type`, `device_type`, `active_timeout`, `allow_url`, `timeout`, `menu_id`, `status`, `del_flag`, `create_dept`, `create_by`, `create_time`, `update_by`, `update_time`, `app_ip_list`, `layout_config`, `register_enabled`, `reset_pwd_enabled`) VALUES
 (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc123', 'pc', 'password,social,sms', 'pc', 1800, '*', 604800, NULL, '0', '0', 103, 1, '2025-11-25 13:49:14', 1, '2025-12-24 16:54:58', NULL, NULL, '0', '1'),
 (2, '428a8310cd442757ae699df5d894f051', 'app123', 'app', 'password,sms,social', 'android', 1800, '*', 604800, NULL, '0', '0', 103, 1, '2025-11-25 13:49:14', 1, '2025-11-25 13:49:14', NULL, NULL, '0', '1'),
-(2125130375045914626, '3815b0d5fa9f69981d04bde9b217d83d', 'bL1AktZA0LqyhRVZod5RUYllcPK84tBbJvrWj_x-J74', '欢乐多超市运营系统', 'password,xcx', 'pc', 1800, '*', 604800, 2125130366049132545, '0', '0', NULL, 1, '2026-11-24 15:32:19', 1, '2026-11-24 15:32:19', NULL, NULL, '1', '1'),
-(2125139618276847618, '1fba98e82ed078dde44f05177d1e1051', 'FRBzjFzRfPqbPYJCh-t7UJrEZ8ifXKMXXg3KD4Yswwc', '京东小卖部', 'password,xcx', 'pc', 1800, '*', 604800, 2125139612312547329, '0', '0', NULL, 1, '2026-11-24 16:09:03', 1, '2026-11-24 16:09:03', NULL, NULL, '1', '1');
+(2125130375045914626, '3815b0d5fa9f69981d04bde9b217d83d', 'REPLACE_WITH_CLIENT_SECRET', '欢乐多超市运营系统', 'password,xcx', 'pc', 1800, '*', 604800, 2125130366049132545, '0', '0', NULL, 1, '2026-11-24 15:32:19', 1, '2026-11-24 15:32:19', NULL, NULL, '1', '1'),
+(2125139618276847618, '1fba98e82ed078dde44f05177d1e1051', 'REPLACE_WITH_CLIENT_SECRET', '京东小卖部', 'password,xcx', 'pc', 1800, '*', 604800, 2125139612312547329, '0', '0', NULL, 1, '2026-11-24 16:09:03', 1, '2026-11-24 16:09:03', NULL, NULL, '1', '1');
 
 DROP TABLE IF EXISTS `sys_client_role`;
 
@@ -4778,7 +4778,7 @@ CREATE TABLE `sys_social` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='社会化关系表';
 
-INSERT INTO `sys_social` (`id`, `user_id`, `tenant_id`, `auth_id`, `source`, `open_id`, `user_name`, `nick_name`, `email`, `avatar`, `access_token`, `expire_in`, `refresh_token`, `access_code`, `union_id`, `scope`, `token_type`, `id_token`, `mac_algorithm`, `mac_key`, `code`, `oauth_token`, `oauth_token_secret`, `create_dept`, `create_by`, `create_time`, `update_by`, `update_time`, `del_flag`) VALUES (1996871729326133249, 1, '000000', 'wechat_enterprise_sjht6896475913325498871', 'wechat_enterprise_cloudauth', '6896475913325498871', 'admin', '超级管理员', '', '', 'c1wHal6kmIZWjwmTAplq0Fhf9tMrURI4xHpxqPBEdI8', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 103, 1, '2025-12-05 17:18:15', 1, '2025-12-05 17:18:15', '0');
+INSERT INTO `sys_social` (`id`, `user_id`, `tenant_id`, `auth_id`, `source`, `open_id`, `user_name`, `nick_name`, `email`, `avatar`, `access_token`, `expire_in`, `refresh_token`, `access_code`, `union_id`, `scope`, `token_type`, `id_token`, `mac_algorithm`, `mac_key`, `code`, `oauth_token`, `oauth_token_secret`, `create_dept`, `create_by`, `create_time`, `update_by`, `update_time`, `del_flag`) VALUES (1996871729326133249, 1, '000000', 'wechat_enterprise_sjht6896475913325498871', 'wechat_enterprise_cloudauth', '6896475913325498871', 'admin', '超级管理员', '', '', 'REPLACE_WITH_ACCESS_TOKEN', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 103, 1, '2025-12-05 17:18:15', 1, '2025-12-05 17:18:15', '0');
 
 DROP TABLE IF EXISTS `sys_tenant`;
 

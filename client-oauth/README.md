@@ -83,7 +83,7 @@ sa-token:
     # 使用 HTTP 请求校验 ticket
     is-http: true
     # API 接口调用秘钥
-    secret-key: qaJ5LPLxCPSZTtsfqTB8xkQC7MOTyqhx0KGJEhy84Fo
+    secret-key: REPLACE_WITH_SECRET_KEY
 ```
 
 ### 2.3、业务 Controller 示例
@@ -202,7 +202,7 @@ sa-token:
     # 使用 HTTP 请求校验 ticket
     is-http: true
     # API 接口调用秘钥
-    secret-key: SSO-C3-kQwIOrYvnXmSDkwEiFngrKidMcdrgKor
+    secret-key: REPLACE_WITH_SECRET_KEY
 ```
 
 > [!IMPORTANT]
